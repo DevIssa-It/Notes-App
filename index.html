@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Notes App</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <app-bar></app-bar>
+
+    <main class="container">
+      <section class="notes-app">
+        <note-input></note-input>
+
+        <section class="notes-section">
+          <div class="notes-header">
+            <h2 id="notesHeading">Notes</h2>
+            <div class="filters">
+              <button class="btn ghost filter-btn active" data-filter="all">
+                All
+              </button>
+              <button class="btn ghost filter-btn" data-filter="archived">
+                Archived
+              </button>
+            </div>
+          </div>
+          <note-list class="notes-grid" id="notesGrid">
+            <!-- Notes will be loaded from API -->
+          </note-list>
+
+          <section class="archived-section" aria-labelledby="archivedHeading">
+            <div class="archived-header">
+              <h3 id="archivedHeading">
+                Archived Notes (<span id="archivedCount">0</span>)
+              </h3>
+              <div class="archived-actions">
+                <button class="btn" id="restoreAllBtn">Restore All</button>
+                <button class="btn" id="deleteAllArchivedBtn">
+                  Delete All Archived
+                </button>
+              </div>
+            </div>
+            <note-list id="archivedGrid" class="notes-grid"></note-list>
+          </section>
+        </section>
+      </section>
+    </main>
+
+    <!-- Loading Indicator -->
+    <loading-indicator></loading-indicator>
+  </body>
+</html>
