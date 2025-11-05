@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Config files
+webpack.config.js
+.prettierrc
+.eslintrc.js
+
+# Test files
+*.test.js
+*.spec.js
+
+# Other
+*.min.js

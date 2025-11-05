@@ -110,11 +110,11 @@ class SearchBar extends HTMLElement {
     super();
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
-    
+
     this.input = this.shadowRoot.querySelector('.search-input');
     this.clearBtn = this.shadowRoot.querySelector('.clear-btn');
     this.resultEl = this.shadowRoot.querySelector('.search-result');
-    
+
     this.onInput = this.onInput.bind(this);
     this.onClear = this.onClear.bind(this);
   }
@@ -122,7 +122,7 @@ class SearchBar extends HTMLElement {
   connectedCallback() {
     this.input.addEventListener('input', this.onInput);
     this.clearBtn.addEventListener('click', this.onClear);
-    
+
     // Add keyboard shortcut: Ctrl+K or Cmd+K to focus search
     document.addEventListener('keydown', this.onGlobalKeydown.bind(this));
   }
@@ -141,14 +141,14 @@ class SearchBar extends HTMLElement {
 
   onInput(e) {
     const query = e.target.value.trim();
-    
+
     // Show/hide clear button
     if (query) {
       this.clearBtn.classList.add('visible');
     } else {
       this.clearBtn.classList.remove('visible');
     }
-    
+
     // Emit search event
     this.dispatchEvent(
       new CustomEvent('search', {
@@ -164,7 +164,7 @@ class SearchBar extends HTMLElement {
     this.clearBtn.classList.remove('visible');
     this.resultEl.textContent = '';
     this.resultEl.classList.remove('active');
-    
+
     // Emit search event with empty query
     this.dispatchEvent(
       new CustomEvent('search', {
@@ -173,7 +173,7 @@ class SearchBar extends HTMLElement {
         composed: true,
       })
     );
-    
+
     this.input.focus();
   }
 

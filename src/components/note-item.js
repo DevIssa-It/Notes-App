@@ -151,6 +151,7 @@ class NoteItem extends HTMLElement {
   static get observedAttributes() {
     return ['data-id', 'archived', 'title', 'body', 'created-at'];
   }
+
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -220,6 +221,7 @@ class NoteItem extends HTMLElement {
       })
     );
   }
+
   onDelete() {
     this.dispatchEvent(
       new CustomEvent('note-delete', {

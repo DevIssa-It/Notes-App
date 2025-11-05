@@ -169,17 +169,20 @@ class NoteInput extends HTMLElement {
     // Add event listeners
     if (this.form) this.form.addEventListener('submit', this.onSubmit);
     if (this.resetBtn) this.resetBtn.addEventListener('click', this.onReset);
-    if (this.titleInput) this.titleInput.addEventListener('input', this.onInput);
+    if (this.titleInput)
+      this.titleInput.addEventListener('input', this.onInput);
     if (this.bodyInput) this.bodyInput.addEventListener('input', this.onInput);
-    
+
     this.updateButtonState();
   }
 
   disconnectedCallback() {
     if (this.form) this.form.removeEventListener('submit', this.onSubmit);
     if (this.resetBtn) this.resetBtn.removeEventListener('click', this.onReset);
-    if (this.titleInput) this.titleInput.removeEventListener('input', this.onInput);
-    if (this.bodyInput) this.bodyInput.removeEventListener('input', this.onInput);
+    if (this.titleInput)
+      this.titleInput.removeEventListener('input', this.onInput);
+    if (this.bodyInput)
+      this.bodyInput.removeEventListener('input', this.onInput);
   }
 
   onInput() {
@@ -214,7 +217,7 @@ class NoteInput extends HTMLElement {
   onSubmit(e) {
     e.preventDefault();
     const note = {
-      id: 'notes-' + Math.random().toString(36).slice(2, 9),
+      id: `notes-${Math.random().toString(36).slice(2, 9)}`,
       title: this.titleInput.value.trim(),
       body: this.bodyInput.value.trim(),
       createdAt: new Date().toISOString(),

@@ -106,4 +106,5 @@ export const notesData = [
   },
 ];
 
-console.log('notesData loaded', notesData.length);
+// Data loaded successfully
+// console.log('notesData loaded', notesData.length);

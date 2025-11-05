@@ -4,8 +4,8 @@ import './components/note-item.js';
 import './components/note-list.js';
 import './components/loading-indicator.js';
 import './components/search-bar.js';
-import NotesAPI from './api.js';
 import Swal from 'sweetalert2';
+import NotesAPI from './api.js';
 
 const notesStore = new Map();
 const archivedStore = new Map();
@@ -307,13 +307,15 @@ async function mount() {
           'Restoring all notes...',
           `Processing ${archivedIds.length} notes`
         );
-        // Unarchive all notes
-        for (const id of archivedIds) {
-          await NotesAPI.unarchiveNote(id);
-          const note = archivedStore.get(id);
-          archivedStore.delete(id);
-          notesStore.set(id, { ...note, archived: false });
-        }
+        // Unarchive all notes - Use Promise.all for parallel execution
+        await Promise.all(
+          archivedIds.map(async (id) => {
+            await NotesAPI.unarchiveNote(id);
+            const note = archivedStore.get(id);
+            archivedStore.delete(id);
+            notesStore.set(id, { ...note, archived: false });
+          })
+        );
         renderNotes(notesGrid);
         renderArchivedSection(archivedGrid);
         updateArchivedCount();
@@ -358,10 +360,13 @@ async function mount() {
             'Deleting all archived notes...',
             `Processing ${archivedIds.length} notes`
           );
-          for (const id of archivedIds) {
-            await NotesAPI.deleteNote(id);
-            archivedStore.delete(id);
-          }
+          // Delete all archived notes - Use Promise.all for parallel execution
+          await Promise.all(
+            archivedIds.map(async (id) => {
+              await NotesAPI.deleteNote(id);
+              archivedStore.delete(id);
+            })
+          );
           renderNotes(notesGrid);
           renderArchivedSection(archivedGrid);
           updateArchivedCount();
@@ -401,7 +406,7 @@ async function mount() {
     }
   });
 
-  document.body.addEventListener('import-notes', (e) => {
+  document.body.addEventListener('import-notes', () => {
     Swal.fire({
       icon: 'info',
       title: 'Import Not Available',

@@ -4,6 +4,8 @@
 
 [![Status](https://img.shields.io/badge/status-complete-success)]()
 [![Kriteria](https://img.shields.io/badge/kriteria-11/11-brightgreen)]()
+[![Code Quality](https://img.shields.io/badge/ESLint-passing-brightgreen)]()
+[![Code Style](https://img.shields.io/badge/code%20style-Airbnb-ff69b4)]()
 
 ## 📋 Kriteria Submission
 
@@ -107,6 +109,7 @@ notes-app/
 - **Fetch API** - HTTP client untuk API calls
 - **SweetAlert2** - Alert & confirmation dialogs
 - **Prettier** - Code formatter
+- **ESLint** ⭐ NEW - Linter dengan Airbnb style guide
 - **CSS Grid & Flexbox** - Responsive layout
 
 ---
@@ -156,6 +159,15 @@ npm run build
 
 # Format semua kode dengan Prettier
 npm run format
+
+# Lint kode dengan ESLint (Airbnb style guide) ⭐ NEW
+npm run lint
+
+# Auto-fix ESLint issues ⭐ NEW
+npm run lint:fix
+
+# Check kode quality (ESLint + Prettier) ⭐ NEW
+npm run lint:check
 ```
 
 ### Webpack Configuration
@@ -286,6 +298,8 @@ Sebelum submit, pastikan:
 - [x] `npm install` berhasil
 - [x] `npm run build` berhasil
 - [x] `npm run start-dev` berjalan di port 9000
+- [x] `npm run lint` passing tanpa error ⭐ NEW
+- [x] `npm run format` berhasil format kode ⭐ NEW
 - [x] Create note berfungsi
 - [x] Display notes dari API
 - [x] Delete note dengan konfirmasi
@@ -297,13 +311,73 @@ Sebelum submit, pastikan:
 - [x] Accessibility features bekerja ⭐ NEW
 - [x] ARIA labels ada ⭐ NEW
 - [x] Tab navigation berfungsi ⭐ NEW
+- [x] ESLint configured dengan Airbnb style ⭐ NEW
 - [x] Prettier configured (`.prettierrc` ada)
 - [x] Webpack configured (`webpack.config.js` ada)
 - [x] No console errors
 
 ---
 
-## ♿ Accessibility Features ⭐ NEW
+## 🎯 Code Quality & Best Practices ⭐ NEW
+
+### ESLint Configuration
+Proyek ini menggunakan **ESLint** dengan **Airbnb JavaScript Style Guide** untuk memastikan kualitas kode yang konsisten.
+
+**Benefits:**
+- ✅ Deteksi error lebih awal sebelum runtime
+- ✅ Konsistensi penulisan kode di seluruh proyek
+- ✅ Best practices enforcement
+- ✅ Menghindari common pitfalls
+- ✅ Integrasi dengan Prettier untuk formatting
+
+**Configuration Files:**
+- `.eslintrc.js` - ESLint rules & configuration
+- `.eslintignore` - Files to ignore from linting
+
+**Custom Rules:**
+```javascript
+{
+  "no-console": ["warn", { "allow": ["warn", "error"] }],
+  "import/extensions": ["error", "ignorePackages", { "js": "always" }],
+  "max-len": ["warn", { "code": 100 }],
+  // ... and more
+}
+```
+
+**Usage:**
+```bash
+# Check for lint errors
+npm run lint
+
+# Auto-fix lint errors
+npm run lint:fix
+
+# Check both ESLint and Prettier
+npm run lint:check
+```
+
+### Prettier Configuration
+**File:** `.prettierrc`
+```json
+{
+  "semi": true,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "es5"
+}
+```
+
+### Code Quality Improvements Made:
+1. ✅ Removed `await` inside loops - menggunakan `Promise.all()` untuk parallel execution
+2. ✅ Fixed import order - external imports before local
+3. ✅ Fixed unused variables
+4. ✅ Applied consistent code formatting
+5. ✅ Added blank lines between class members
+6. ✅ Used template literals instead of string concatenation
+
+---
+
+## ♿ Accessibility Features
 
 ### ARIA Labels
 - Search bar dengan `aria-label="Search notes"`

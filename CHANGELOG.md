@@ -1,5 +1,45 @@
 # Changelog
 
+## [2.2.0] - 2025-11-05
+
+### ✨ Added - Code Quality Improvements
+
+#### 📋 ESLint Integration
+- **ESLint Setup**: Configured ESLint dengan Airbnb JavaScript Style Guide
+- **Dependencies Added**:
+  - `eslint` - Core linting engine
+  - `eslint-config-airbnb-base` - Airbnb style guide
+  - `eslint-plugin-import` - Import/export linting
+  - `eslint-config-prettier` - Prettier integration
+  
+**Files Added:**
+- `.eslintrc.js` - ESLint configuration
+- `.eslintignore` - Files to ignore
+
+**NPM Scripts Added:**
+- `npm run lint` - Check for lint errors
+- `npm run lint:fix` - Auto-fix lint errors
+- `npm run lint:check` - Check ESLint + Prettier
+
+#### 🔧 Code Quality Fixes
+- ✅ Fixed `await` in loops - menggunakan `Promise.all()` untuk better performance
+- ✅ Fixed import order (external before local)
+- ✅ Removed unused variables
+- ✅ Added blank lines between class members
+- ✅ Used template literals instead of string concatenation
+- ✅ Removed console.log statements
+
+**Performance Improvements:**
+- Bulk operations sekarang berjalan parallel (faster)
+- Restore All & Delete All Archived menggunakan `Promise.all()`
+
+### 📝 Documentation
+- Updated README.md dengan Code Quality section
+- Added ESLint badges
+- Added linting commands documentation
+
+---
+
 ## [2.1.0] - 2025-11-05
 
 ### ✨ Added - New Optional Features
