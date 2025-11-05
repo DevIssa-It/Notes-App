@@ -1,7 +1,7 @@
 {
   "version": 2,
   "buildCommand": "npm run build",
-  "outputDirectory": "dist",
+  "outputDirectory": "src",
   "devCommand": "npm run start-dev",
   "installCommand": "npm install",
   "framework": null,
