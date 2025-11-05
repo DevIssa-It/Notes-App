@@ -29,18 +29,29 @@
 ## 🚀 Quick Start
 
 ```bash
-# Install dependencies
+# 1. Install dependencies
 npm install
 
-# Development mode (http://localhost:9000)
+# 2. Development mode (http://localhost:9000)
 npm run start-dev
 
-# Production build
-npm run build
+# 3. Check code quality
+npm run lint
 
-# Format code
-npm run format
+# 4. Production build
+npm run build
 ```
+
+### 📦 Available Commands
+
+| Command | Deskripsi |
+|---------|-----------|
+| `npm run start-dev` | Development server (port 9000) |
+| `npm run build` | Production build → `dist/` (109 KB) |
+| `npm run lint` | Check code quality (ESLint) |
+| `npm run lint:fix` | Auto-fix lint issues |
+| `npm run format` | Format code (Prettier) |
+| `npm run lint:check` | Check ESLint + Prettier |
 
 ---
 
@@ -262,24 +273,176 @@ npm run build
 
 Output ada di folder `dist/` dengan files:
 - `index.html` - HTML dengan bundle injected
-- `bundle.js` - Minified JavaScript (104 KB)
+- `bundle.js` - Minified JavaScript (109 KB)
 - `styles.css` - Global styles
 
-### Deploy Options
+### Deploy to Vercel ⭐ RECOMMENDED
 
-**Netlify / Vercel:**
+**Otomatis via GitHub:**
+1. Push kode ke GitHub repository
+2. Import project di [vercel.com](https://vercel.com)
+3. Vercel akan otomatis detect settings dari `vercel.json`
+4. Deploy! ✅
+
+**Manual via CLI:**
 ```bash
-# Netlify
-netlify deploy --prod --dir=dist
+# Install Vercel CLI
+npm i -g vercel
 
-# Vercel
+# Deploy
+vercel
+
+# Deploy production
 vercel --prod
 ```
 
-**GitHub Pages:**
+**Configuration:** `vercel.json` sudah configured dengan:
+- Build Command: `npm run build`
+- Output Directory: `dist`
+- SPA routing support
+
+### Deploy to Netlify
+
+**Otomatis via GitHub:**
+1. Push kode ke GitHub
+2. Connect repository di [netlify.com](https://netlify.com)
+3. Build settings otomatis dari `netlify.toml`
+4. Deploy! ✅
+
+**Manual via CLI:**
+```bash
+# Install Netlify CLI
+npm i -g netlify-cli
+
+# Deploy
+netlify deploy --prod --dir=dist
+```
+
+**Configuration:** `netlify.toml` sudah configured dengan:
+- Build Command: `npm run build`
+- Publish Directory: `dist`
+
+### Deploy Options Lainnya
+
+**Method 1: Vercel CLI**
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+vercel --prod
+```
+
+**Method 2: GitHub Integration**
+1. Push repository ke GitHub
+2. Import project di [vercel.com](https://vercel.com)
+3. Vercel akan auto-detect `vercel.json` configuration
+4. Deploy otomatis setiap push ke main branch
+
+**Configuration:**
+File `vercel.json` sudah configured:
+```json
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "routes": [{ "src": "/(.*)", "dest": "/index.html" }]
+}
+```
+
+### Deploy to Netlify
+
+**Netlify CLI:**
+```bash
+# Install Netlify CLI
+npm i -g netlify-cli
+
+# Deploy
+netlify deploy --prod --dir=dist
+```
+
+**netlify.toml Configuration:**
+```toml
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+```
+
+### Deploy to GitHub Pages
 ```bash
 git subtree push --prefix dist origin gh-pages
 ```
+
+---
+
+## � Pre-Deployment Verification
+
+Sebelum deploy, jalankan verification script untuk memastikan semua siap:
+
+```powershell
+# PowerShell (Windows)
+.\verify-deployment.ps1
+
+# Bash (Linux/Mac)
+bash verify-deployment.sh
+```
+
+Script ini akan check:
+- ✅ node_modules installed
+- ✅ dist folder exists
+- ✅ vercel.json/netlify.toml configured
+- ✅ ESLint passing
+- ✅ Build successful
+- ✅ All required files in dist/
+
+**📚 Untuk panduan deployment lengkap, baca:** `DEPLOYMENT.md`
+
+---
+
+## �🔧 Deployment Troubleshooting
+
+### ❌ Vercel Error: "No Output Directory named 'public' found"
+
+**Penyebab:** Vercel default mencari folder `public`, tapi webpack output ke `dist`
+
+**✅ Solusi:** 
+- File `vercel.json` sudah configured dengan benar:
+  ```json
+  {
+    "outputDirectory": "dist"
+  }
+  ```
+- Pastikan `vercel.json` ada di root project
+- Jika masih error, set di Vercel Dashboard → Project Settings → Build & Development Settings → Output Directory → `dist`
+
+### ❌ 404 Error on Page Refresh (SPA Routing)
+
+**Penyebab:** Server tidak redirect semua routes ke `index.html`
+
+**✅ Solusi:**
+- **Vercel:** `vercel.json` sudah configured dengan routes
+- **Netlify:** `netlify.toml` sudah configured dengan redirects
+- **GitHub Pages:** Tambahkan `404.html` yang sama dengan `index.html`
+
+### ❌ Build Failed on Deploy
+
+**✅ Checklist:**
+1. Run `npm run build` locally terlebih dahulu
+2. Pastikan tidak ada error di `npm run lint`
+3. Check Node.js version (min v14)
+4. Verify `package.json` scripts ada
+5. Clear cache dan rebuild
+
+### ❌ API CORS Error
+
+**✅ Solusi:**
+- Notes API sudah support CORS
+- Jika masih error, check browser console untuk detail
+- Verify API endpoint: `https://notes-api.dicoding.dev/v2`
 
 ---
 
@@ -409,7 +572,54 @@ npm run lint:check
 
 ---
 
-## 📄 License
+## � Changelog
+
+### Version 2.0.0 (November 2025)
+
+#### ✨ New Features
+- **Search Feature** - Real-time search dengan keyboard shortcut (Ctrl+K / Cmd+K)
+- **Accessibility (a11y)** - ARIA labels, keyboard navigation, screen reader support
+- **ESLint Integration** - Airbnb JavaScript Style Guide untuk code quality
+- **Deployment Configs** - Vercel dan Netlify configurations
+
+#### 🔧 Improvements
+- Refactored loops to use `Promise.all()` for better performance (no await in loop)
+- Added comprehensive error handling with SweetAlert2
+- Improved loading states with custom web component
+- Enhanced code formatting with Prettier
+- Added keyboard shortcuts for common actions (Delete, Archive)
+
+#### 🐛 Bug Fixes
+- Fixed CORS issues with API integration
+- Fixed validation on empty notes
+- Fixed loading indicator positioning
+- Fixed responsive layout on mobile devices
+
+#### 📚 Documentation
+- Updated README.md with complete features documentation
+- Added accessibility features documentation
+- Added deployment troubleshooting guide
+- Added code quality guidelines
+
+#### 🎯 Code Quality
+- ESLint: 0 errors, 0 warnings
+- Build size: 109 KB (production)
+- All 11 criteria met (5 mandatory + 6 optional)
+
+### Version 1.0.0 (Initial Release)
+
+#### Core Features
+- Web Components (6 custom elements)
+- RESTful API integration
+- CRUD operations (Create, Read, Delete)
+- Archive/Unarchive functionality
+- Loading indicators
+- Responsive design
+- Webpack 5 bundler
+
+---
+
+## �📄 License
 
 ISC
 
@@ -423,6 +633,5 @@ ISC
 
 ---
 
-**Dibuat dengan ❤️ untuk Dicoding Submission**
 
 
