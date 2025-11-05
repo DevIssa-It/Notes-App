@@ -3,12 +3,14 @@ import './components/note-input.js';
 import './components/note-item.js';
 import './components/note-list.js';
 import './components/loading-indicator.js';
+import './components/search-bar.js';
 import NotesAPI from './api.js';
 import Swal from 'sweetalert2';
 
 const notesStore = new Map();
 const archivedStore = new Map();
 let currentFilter = 'all'; // 'all' or 'archived'
+let currentSearchQuery = ''; // current search query
 let loadingIndicator = null;
 
 // Helper function to show loading
@@ -83,39 +85,76 @@ function renderNotes(container) {
   container.innerHTML = ''; // clear
   let arr = Array.from(notesStore.values());
 
+  // Filter by search query
+  if (currentSearchQuery) {
+    const query = currentSearchQuery.toLowerCase();
+    arr = arr.filter(
+      (n) =>
+        n.title.toLowerCase().includes(query) ||
+        n.body.toLowerCase().includes(query)
+    );
+  }
+
   // sort by createdAt desc
   arr.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   arr.forEach((n) => {
     const item = document.createElement('note-item');
     item.data = n; // sets attributes
     item.setAttribute('data-id', n.id);
+    item.setAttribute('tabindex', '0'); // Make focusable
 
     container.appendChild(item);
   });
 
+  // Update search result count
+  const searchBar = document.querySelector('search-bar');
+  if (searchBar && currentSearchQuery) {
+    searchBar.updateResult(arr.length, notesStore.size);
+  }
+
   // Show message if no notes
   if (arr.length === 0) {
-    container.innerHTML =
-      '<p style="color: #94a3b8; text-align: center; padding: 40px;">No notes yet. Create your first note!</p>';
+    if (currentSearchQuery) {
+      container.innerHTML = `<p style="color: #94a3b8; text-align: center; padding: 40px;">No notes found for "${currentSearchQuery}"</p>`;
+    } else {
+      container.innerHTML =
+        '<p style="color: #94a3b8; text-align: center; padding: 40px;">No notes yet. Create your first note!</p>';
+    }
   }
 }
 
 function renderArchivedSection(container) {
   container.innerHTML = '';
-  const arr = Array.from(archivedStore.values());
+  let arr = Array.from(archivedStore.values());
+
+  // Filter by search query
+  if (currentSearchQuery) {
+    const query = currentSearchQuery.toLowerCase();
+    arr = arr.filter(
+      (n) =>
+        n.title.toLowerCase().includes(query) ||
+        n.body.toLowerCase().includes(query)
+    );
+  }
+
   arr.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   arr.forEach((n) => {
     const item = document.createElement('note-item');
     item.data = n;
     item.setAttribute('data-id', n.id);
     item.setAttribute('archived', 'true');
+    item.setAttribute('tabindex', '0'); // Make focusable
     container.appendChild(item);
   });
 
   // Show message if no archived notes
   if (arr.length === 0) {
-    container.innerHTML =
-      '<p style="color: #94a3b8; text-align: center; padding: 20px;">No archived notes</p>';
+    if (currentSearchQuery) {
+      container.innerHTML = `<p style="color: #94a3b8; text-align: center; padding: 20px;">No archived notes found for "${currentSearchQuery}"</p>`;
+    } else {
+      container.innerHTML =
+        '<p style="color: #94a3b8; text-align: center; padding: 20px;">No archived notes</p>';
+    }
   }
 }
 
@@ -132,9 +171,11 @@ function setFilter(filter) {
   renderNotes(notesGrid);
   renderArchivedSection(archivedGrid);
   updateArchivedCount();
-  // update active class on buttons
+  // update active class on buttons and aria-pressed
   document.querySelectorAll('.filter-btn').forEach((b) => {
-    b.classList.toggle('active', b.dataset.filter === currentFilter);
+    const isActive = b.dataset.filter === currentFilter;
+    b.classList.toggle('active', isActive);
+    b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
   });
 }
 
@@ -150,6 +191,13 @@ async function mount() {
   renderNotes(notesGrid);
   renderArchivedSection(archivedGrid);
   updateArchivedCount();
+
+  // Listen to search
+  document.body.addEventListener('search', (e) => {
+    currentSearchQuery = e.detail.query;
+    renderNotes(notesGrid);
+    renderArchivedSection(archivedGrid);
+  });
 
   // Listen to add
   document.body.addEventListener('note-added', async (e) => {
@@ -377,7 +425,9 @@ async function mount() {
 
   // initialize filter buttons state
   document.querySelectorAll('.filter-btn').forEach((b) => {
-    b.classList.toggle('active', b.dataset.filter === currentFilter);
+    const isActive = b.dataset.filter === currentFilter;
+    b.classList.toggle('active', isActive);
+    b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
   });
 }
 

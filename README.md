@@ -3,7 +3,7 @@
 > Aplikasi pencatatan menggunakan Web Components, Webpack, dan RESTful API
 
 [![Status](https://img.shields.io/badge/status-complete-success)]()
-[![Kriteria](https://img.shields.io/badge/kriteria-9/9-brightgreen)]()
+[![Kriteria](https://img.shields.io/badge/kriteria-11/11-brightgreen)]()
 
 ## 📋 Kriteria Submission
 
@@ -14,11 +14,13 @@
 4. **Fetch API** - Semua HTTP requests menggunakan Fetch API
 5. **Loading Indicator** - Web Component untuk loading state
 
-### ✅ Kriteria Opsional (4/4)
+### ✅ Kriteria Opsional (6/6)
 1. **Fitur Arsip** - Archive/unarchive notes, bulk operations
 2. **Error Feedback** - SweetAlert2 untuk error handling
 3. **Animasi** - CSS transitions, transforms, hover effects
 4. **Prettier** - Code formatter dengan config `.prettierrc`
+5. **Search Feature** ⭐ NEW - Real-time search dengan keyboard shortcut (Ctrl+K)
+6. **Accessibility (a11y)** ⭐ NEW - ARIA labels, keyboard navigation, screen reader support
 
 ---
 
@@ -50,7 +52,8 @@ notes-app/
 │   │   ├── loading-indicator.js  # Loading spinner
 │   │   ├── note-input.js    # Form input catatan
 │   │   ├── note-item.js     # Card catatan
-│   │   └── note-list.js     # Grid container
+│   │   ├── note-list.js     # Grid container
+│   │   └── search-bar.js    # Search component ⭐ NEW
 │   ├── api.js               # API service layer (7 methods)
 │   └── app.js               # Main application logic
 ├── index.html               # HTML template
@@ -62,16 +65,18 @@ notes-app/
 
 ---
 
-## � Fitur Aplikasi
+## 🎯 Fitur Aplikasi
 
 - ✅ **CRUD Operations** - Create, Read, Delete notes via API
 - ✅ **Archive System** - Archive/unarchive notes, bulk operations
+- ✅ **Real-time Search** ⭐ NEW - Instant search with keyboard shortcut (Ctrl+K / Cmd+K)
 - ✅ **Real-time Validation** - Form validation dengan feedback visual
 - ✅ **Loading States** - Indicator untuk semua async operations
 - ✅ **Error Handling** - SweetAlert2 alerts untuk errors & confirmations
 - ✅ **Export Data** - Download notes sebagai JSON
 - ✅ **Responsive Design** - Mobile, tablet, desktop ready
 - ✅ **Smooth Animations** - CSS transitions & transforms
+- ✅ **Accessibility** ⭐ NEW - ARIA labels, keyboard navigation, screen reader support
 
 ---
 
@@ -179,6 +184,20 @@ npm run format
 
 ## 📝 Usage Flow
 
+### Mencari Catatan ⭐ NEW
+1. Klik search bar atau tekan Ctrl+K / Cmd+K
+2. Ketik kata kunci (title atau body)
+3. Hasil real-time filtering
+4. Counter menunjukkan jumlah hasil
+5. Klik × untuk clear search
+
+### Keyboard Shortcuts ⭐ NEW
+- **Ctrl+K / Cmd+K** - Focus search bar
+- **Delete** - Delete focused note (when note card focused)
+- **A** - Archive/Unarchive focused note (when note card focused)
+- **Tab** - Navigate between notes
+- **Enter** - Activate button/action
+
 ### Membuat Catatan
 1. Isi form title & body
 2. Validasi otomatis (title required, body max 1000 char)
@@ -273,9 +292,46 @@ Sebelum submit, pastikan:
 - [x] Archive/unarchive berfungsi
 - [x] Loading indicators muncul
 - [x] Error handling bekerja
+- [x] Search feature berfungsi ⭐ NEW
+- [x] Keyboard shortcuts berfungsi ⭐ NEW
+- [x] Accessibility features bekerja ⭐ NEW
+- [x] ARIA labels ada ⭐ NEW
+- [x] Tab navigation berfungsi ⭐ NEW
 - [x] Prettier configured (`.prettierrc` ada)
 - [x] Webpack configured (`webpack.config.js` ada)
 - [x] No console errors
+
+---
+
+## ♿ Accessibility Features ⭐ NEW
+
+### ARIA Labels
+- Search bar dengan `aria-label="Search notes"`
+- Filter buttons dengan `aria-pressed` state
+- Archived count dengan `aria-live="polite"`
+- Loading indicator dengan `role="status"` dan `aria-live="polite"`
+- Note lists dengan `role="list"` dan `aria-label`
+- Individual notes dengan descriptive `aria-label`
+
+### Keyboard Navigation
+- **Tab** - Navigate through interactive elements
+- **Enter/Space** - Activate buttons
+- **Ctrl+K / Cmd+K** - Quick access to search
+- **Delete** - Delete focused note
+- **A** - Archive/Unarchive focused note
+- **Escape** - Dismiss dialogs
+
+### Screen Reader Support
+- Semantic HTML5 elements (`<main>`, `<section>`, `<article>`)
+- Descriptive labels untuk semua interactive elements
+- Live regions untuk dynamic content updates
+- Hidden headings untuk screen reader navigation
+
+### Focus Management
+- Visible focus indicators
+- Logical tab order
+- Focus trap dalam modals
+- Auto-focus pada search (Ctrl+K)
 
 ---
 

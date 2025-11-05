@@ -3,51 +3,60 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Notes App</title>
+    <meta name="description" content="Modern notes app with archive, search, and cloud sync features" />
+    <meta name="theme-color" content="#7c3aed" />
+    <title>Notes App - Organize Your Thoughts</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <app-bar></app-bar>
+    <app-bar role="banner"></app-bar>
 
-    <main class="container">
-      <section class="notes-app">
+    <main class="container" role="main">
+      <section class="notes-app" aria-labelledby="appHeading">
+        <h1 id="appHeading" class="visually-hidden">Notes Application</h1>
+        
         <note-input></note-input>
+
+        <!-- Search Bar -->
+        <search-bar role="search"></search-bar>
 
         <section class="notes-section">
           <div class="notes-header">
             <h2 id="notesHeading">Notes</h2>
-            <div class="filters">
-              <button class="btn ghost filter-btn active" data-filter="all">
+            <div class="filters" role="group" aria-label="Filter notes">
+              <button class="btn ghost filter-btn active" data-filter="all" aria-pressed="true">
                 All
               </button>
-              <button class="btn ghost filter-btn" data-filter="archived">
+              <button class="btn ghost filter-btn" data-filter="archived" aria-pressed="false">
                 Archived
               </button>
             </div>
           </div>
-          <note-list class="notes-grid" id="notesGrid">
+          <note-list class="notes-grid" id="notesGrid" role="list" aria-label="Active notes">
             <!-- Notes will be loaded from API -->
           </note-list>
 
           <section class="archived-section" aria-labelledby="archivedHeading">
             <div class="archived-header">
               <h3 id="archivedHeading">
-                Archived Notes (<span id="archivedCount">0</span>)
+                Archived Notes (<span id="archivedCount" aria-live="polite">0</span>)
               </h3>
               <div class="archived-actions">
-                <button class="btn" id="restoreAllBtn">Restore All</button>
-                <button class="btn" id="deleteAllArchivedBtn">
+                <button class="btn" id="restoreAllBtn" aria-label="Restore all archived notes">
+                  Restore All
+                </button>
+                <button class="btn" id="deleteAllArchivedBtn" aria-label="Delete all archived notes">
                   Delete All Archived
                 </button>
               </div>
             </div>
-            <note-list id="archivedGrid" class="notes-grid"></note-list>
+            <note-list id="archivedGrid" class="notes-grid" role="list" aria-label="Archived notes"></note-list>
           </section>
         </section>
       </section>
     </main>
 
     <!-- Loading Indicator -->
-    <loading-indicator></loading-indicator>
+    <loading-indicator role="status" aria-live="polite"></loading-indicator>
   </body>
 </html>
