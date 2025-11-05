@@ -6,6 +6,18 @@
 [![Kriteria](https://img.shields.io/badge/kriteria-11/11-brightgreen)]()
 [![Code Quality](https://img.shields.io/badge/ESLint-passing-brightgreen)]()
 [![Code Style](https://img.shields.io/badge/code%20style-Airbnb-ff69b4)]()
+[![Live Demo](https://img.shields.io/badge/demo-live-blue)](https://notesapp-dev.vercel.app/)
+
+## 🌐 Live Demo
+
+**🚀 [https://notesapp-dev.vercel.app/](https://notesapp-dev.vercel.app/)**
+
+Aplikasi sudah di-deploy di Vercel dan siap digunakan! Coba semua fitur-fiturnya:
+- ✅ Create, Archive, Delete notes
+- ✅ Real-time search (Ctrl+K)
+- ✅ Export/Import data
+- ✅ Keyboard shortcuts
+- ✅ Responsive design
 
 ## 📋 Kriteria Submission
 
@@ -46,9 +58,12 @@ npm run build
 
 | Command | Deskripsi |
 |---------|-----------|
-| `npm run start-dev` | Development server (port 9000) |
-| `npm run build` | Production build → `dist/` (109 KB) |
+| `npm run start-dev` | Development server (port 9000) dengan webpack.dev.js |
+| `npm run build` | Production build → `dist/` dengan webpack.prod.js |
 | `npm run lint` | Check code quality (ESLint) |
+| `npm run lint:fix` | Auto-fix lint issues |
+| `npm run format` | Format code (Prettier) |
+| `npm run lint:check` | Check ESLint + Prettier |
 | `npm run lint:fix` | Auto-fix lint issues |
 | `npm run format` | Format code (Prettier) |
 | `npm run lint:check` | Check ESLint + Prettier |
