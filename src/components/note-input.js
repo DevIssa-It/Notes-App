@@ -140,8 +140,12 @@ template.innerHTML = `
     <div class="row">
       <div class="form-help">Max body length: 1000. Title is required.</div>
       <div class="right">
-        <button class="btn" type="button" id="resetBtn">Reset</button>
-        <button class="btn primary" type="submit" id="submitBtn">Add Note</button>
+        <button class="btn" type="button" id="resetBtn">
+          <i class="fas fa-redo"></i> Reset
+        </button>
+        <button class="btn primary" type="submit" id="submitBtn">
+          <i class="fas fa-plus"></i> Add Note
+        </button>
       </div>
     </div>
   </form>

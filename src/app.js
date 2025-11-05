@@ -1,3 +1,8 @@
+// Import styles
+import '../styles.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+
+// Import components
 import './components/app-bar.js';
 import './components/note-input.js';
 import './components/note-item.js';

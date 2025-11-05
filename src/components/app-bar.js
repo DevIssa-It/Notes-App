@@ -89,8 +89,12 @@ template.innerHTML = `
       <div class="app-title">Notes App</div>
     </div>
     <div class="actions">
-      <button class="btn exportBtn" title="Export notes as JSON">Export</button>
-      <button class="btn importBtn" title="Import notes (JSON)">Import</button>
+      <button class="btn exportBtn" title="Export notes as JSON">
+        <i class="fas fa-download"></i> Export
+      </button>
+      <button class="btn importBtn" title="Import notes (JSON)">
+        <i class="fas fa-upload"></i> Import
+      </button>
       <input type="file" accept="application/json" id="fileInput" style="display:none" />
       <div class="meta">Simple notes - built with Web Components</div>
     </div>

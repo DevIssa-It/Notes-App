@@ -91,16 +91,19 @@ template.innerHTML = `
       background:rgba(30,41,59,0.9);
       border:2px solid #334155;
       color:#e6eef8;
-      padding:9px 16px;
+      padding:9px 14px;
       border-radius:12px;
       cursor:pointer;
-      font-size:0.88rem;
+      font-size:0.95rem;
       font-weight:600;
       transition:all 220ms cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow:0 2px 6px rgba(0,0,0,0.3);
       position:relative;
       overflow:hidden;
       white-space:nowrap;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
     }
     .btn::before{
       content:'';
@@ -140,8 +143,14 @@ template.innerHTML = `
     <div class="meta">
       <div class="created"></div>
       <div class="btns">
-        <button class="btn archiveBtn" title="Archive">Archive</button>
-        <button class="btn deleteBtn" title="Delete">Delete</button>
+        <button class="btn archiveBtn" title="Archive">
+          <i class="fas fa-archive"></i>
+          <span class="btn-text">Archive</span>
+        </button>
+        <button class="btn deleteBtn" title="Delete">
+          <i class="fas fa-trash"></i>
+          <span class="btn-text">Delete</span>
+        </button>
       </div>
     </div>
   </article>
@@ -251,12 +260,16 @@ class NoteItem extends HTMLElement {
       ? new Date(createdAt).toLocaleString()
       : '';
     // update archived state and button label
+    const btnText = this.archiveBtn.querySelector('.btn-text');
+    const btnIcon = this.archiveBtn.querySelector('i');
     if (this.hasAttribute('archived')) {
       this.shadowRoot.querySelector('article').classList.add('archived');
-      this.archiveBtn.textContent = 'Unarchive';
+      if (btnText) btnText.textContent = 'Unarchive';
+      if (btnIcon) btnIcon.className = 'fas fa-box-open';
     } else {
       this.shadowRoot.querySelector('article').classList.remove('archived');
-      this.archiveBtn.textContent = 'Archive';
+      if (btnText) btnText.textContent = 'Archive';
+      if (btnIcon) btnIcon.className = 'fas fa-archive';
     }
 
     // update accessible label on host
