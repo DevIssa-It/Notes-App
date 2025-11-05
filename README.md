@@ -437,6 +437,23 @@ Script ini akan check:
 4. Verify `package.json` scripts ada
 5. Clear cache dan rebuild
 
+### ❌ CSS Tidak Muncul di Vercel/Netlify
+
+**Penyebab:** Path CSS di HTML menggunakan `./styles.css` yang tidak bekerja di production
+
+**✅ Solusi:**
+- Path sudah diperbaiki menjadi `styles.css` (tanpa `./`)
+- File `styles.css` akan di-copy otomatis oleh webpack ke folder `dist/`
+- Rebuild project: `npm run build`
+- Redeploy ke Vercel/Netlify
+
+**Verifikasi:**
+```bash
+# Check if styles.css exists in dist
+ls dist
+# Should show: index.html, bundle.js, styles.css
+```
+
 ### ❌ API CORS Error
 
 **✅ Solusi:**
