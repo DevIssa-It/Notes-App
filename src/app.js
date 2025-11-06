@@ -123,10 +123,10 @@ function renderNotes(container) {
   // Show message if no notes
   if (arr.length === 0) {
     if (currentSearchQuery) {
-      container.innerHTML = `<p style="color: #94a3b8; text-align: center; padding: 40px;">No notes found for "${currentSearchQuery}"</p>`;
+      container.innerHTML = `<p class="empty-message">No notes found for "${currentSearchQuery}"</p>`;
     } else {
       container.innerHTML =
-        '<p style="color: #94a3b8; text-align: center; padding: 40px;">No notes yet. Create your first note!</p>';
+        '<p class="empty-message">No notes yet. Create your first note!</p>';
     }
   }
 }
@@ -158,10 +158,10 @@ function renderArchivedSection(container) {
   // Show message if no archived notes
   if (arr.length === 0) {
     if (currentSearchQuery) {
-      container.innerHTML = `<p style="color: #94a3b8; text-align: center; padding: 20px;">No archived notes found for "${currentSearchQuery}"</p>`;
+      container.innerHTML = `<p class="empty-message">No archived notes found for "${currentSearchQuery}"</p>`;
     } else {
       container.innerHTML =
-        '<p style="color: #94a3b8; text-align: center; padding: 20px;">No archived notes</p>';
+        '<p class="empty-message">No archived notes. Archive notes to see them here.</p>';
     }
   }
 }

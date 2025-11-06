@@ -5,6 +5,24 @@ template.innerHTML = `
       display: block;
       width: 100%;
       margin-bottom: 24px;
+      --search-bg: linear-gradient(145deg, #1e293b, rgba(30, 41, 59, 0.9));
+      --search-border: #334155;
+      --search-text: #e6eef8;
+      --search-placeholder: #64748b;
+      --search-icon: #64748b;
+      --search-result: #94a3b8;
+      --shadow: rgba(0, 0, 0, 0.3);
+      transition: all 300ms ease;
+    }
+
+    :host-context([data-theme='light']) {
+      --search-bg: linear-gradient(145deg, #ffffff, #f8fafc);
+      --search-border: #cbd5e1;
+      --search-text: #0f172a;
+      --search-placeholder: #94a3b8;
+      --search-icon: #64748b;
+      --search-result: #64748b;
+      --shadow: rgba(0, 0, 0, 0.08);
     }
 
     .search-container {
@@ -17,14 +35,14 @@ template.innerHTML = `
     .search-input {
       width: 100%;
       padding: 14px 50px 14px 20px;
-      background: linear-gradient(145deg, #1e293b, rgba(30, 41, 59, 0.9));
-      border: 2px solid #334155;
+      background: var(--search-bg);
+      border: 2px solid var(--search-border);
       border-radius: 16px;
-      color: #e6eef8;
+      color: var(--search-text);
       font-size: 1rem;
       font-family: inherit;
       transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 4px 12px var(--shadow);
       box-sizing: border-box;
     }
 
@@ -35,7 +53,7 @@ template.innerHTML = `
     }
 
     .search-input::placeholder {
-      color: #64748b;
+      color: var(--search-placeholder);
     }
 
     .search-icon {
@@ -43,7 +61,7 @@ template.innerHTML = `
       right: 18px;
       top: 50%;
       transform: translateY(-50%);
-      color: #64748b;
+      color: var(--search-icon);
       pointer-events: none;
       transition: color 250ms ease;
     }
@@ -59,7 +77,7 @@ template.innerHTML = `
       transform: translateY(-50%);
       background: transparent;
       border: none;
-      color: #94a3b8;
+      color: var(--search-result);
       font-size: 1.2rem;
       cursor: pointer;
       padding: 4px 8px;
@@ -76,13 +94,13 @@ template.innerHTML = `
 
     .clear-btn:hover {
       background: rgba(124, 58, 237, 0.2);
-      color: #e6eef8;
+      color: var(--search-text);
     }
 
     .search-result {
       text-align: center;
       margin-top: 12px;
-      color: #94a3b8;
+      color: var(--search-result);
       font-size: 0.9rem;
     }
 
