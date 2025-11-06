@@ -355,7 +355,8 @@ class NoteEditModal extends HTMLElement {
 
     if (bodyInput && charCount) {
       bodyInput.addEventListener('input', () => {
-        const length = bodyInput.value.length;
+        const { value } = bodyInput;
+        const { length } = value;
         charCount.textContent = `${length} / 1000`;
 
         charCount.classList.remove('warning', 'error');
@@ -396,7 +397,8 @@ class NoteEditModal extends HTMLElement {
 
     if (bodyInput) {
       bodyInput.value = this._note.body || '';
-      const length = bodyInput.value.length;
+      const { value } = bodyInput;
+      const { length } = value;
       if (charCount) {
         charCount.textContent = `${length} / 1000`;
       }
