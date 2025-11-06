@@ -138,7 +138,7 @@ note-input {
 .filter-btn {
   background: var(--input-bg);
   border: 1px solid var(--card-border);
-  color: var(--text-secondary);
+  color: var(--text-primary);
   padding: 8px 14px;
   border-radius: 10px;
   cursor: pointer;
