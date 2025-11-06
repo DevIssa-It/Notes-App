@@ -95,16 +95,24 @@ notes-app/
 
 ## 🎯 Fitur Aplikasi
 
-- ✅ **CRUD Operations** - Create, Read, Delete notes via API
+### Core Features
+- ✅ **CRUD Operations** - Create, Read, Update, Delete notes via API
 - ✅ **Archive System** - Archive/unarchive notes, bulk operations
-- ✅ **Real-time Search** ⭐ NEW - Instant search with keyboard shortcut (Ctrl+K / Cmd+K)
+- ✅ **Real-time Search** - Instant search with keyboard shortcut (Ctrl+K / Cmd+K)
 - ✅ **Real-time Validation** - Form validation dengan feedback visual
 - ✅ **Loading States** - Indicator untuk semua async operations
 - ✅ **Error Handling** - SweetAlert2 alerts untuk errors & confirmations
 - ✅ **Export Data** - Download notes sebagai JSON
 - ✅ **Responsive Design** - Mobile, tablet, desktop ready
 - ✅ **Smooth Animations** - CSS transitions & transforms
-- ✅ **Accessibility** ⭐ NEW - ARIA labels, keyboard navigation, screen reader support
+
+### 🌟 Advanced Features (NEW!)
+- ✅ **Edit Note** 🔥 - Edit existing notes with modal dialog
+- ✅ **Note Detail View** 🔥 - Full-page view untuk membaca catatan lengkap
+- ✅ **Dark/Light Mode Toggle** 🔥 - Theme switcher dengan localStorage persistence
+- ✅ **PWA Support** 🔥 - Progressive Web App, installable & offline capable
+- ✅ **Service Worker** 🔥 - Caching untuk offline functionality
+- ✅ **Accessibility (a11y)** - ARIA labels, keyboard navigation, screen reader support
 
 ---
 
@@ -131,12 +139,15 @@ notes-app/
 ## 🔧 Teknologi
 
 - **Web Components** - Custom Elements + Shadow DOM
-- **Webpack 5** - Module bundler + dev server
+- **Webpack 5** - Module bundler + dev server dengan split config (common/dev/prod)
 - **Fetch API** - HTTP client untuk API calls
 - **SweetAlert2** - Alert & confirmation dialogs
 - **Prettier** - Code formatter
-- **ESLint** ⭐ NEW - Linter dengan Airbnb style guide
+- **ESLint** - Linter dengan Airbnb style guide
 - **CSS Grid & Flexbox** - Responsive layout
+- **CSS Variables** - Dynamic theming (dark/light mode)
+- **Service Worker** 🔥 NEW - Offline caching & PWA support
+- **Font Awesome** - Icon library untuk UI enhancement
 
 ---
 
