@@ -13,6 +13,21 @@ template.innerHTML = `
       justify-content: center;
       align-items: center;
       backdrop-filter: blur(4px);
+      --loader-bg: linear-gradient(145deg, #1e293b, rgba(30, 41, 59, 0.95));
+      --loader-border: #334155;
+      --text-primary: #e6eef8;
+      --text-secondary: #94a3b8;
+      --shadow: rgba(0, 0, 0, 0.5);
+      transition: all 300ms ease;
+    }
+
+    :host-context([data-theme='light']) {
+      background: rgba(0, 0, 0, 0.3);
+      --loader-bg: linear-gradient(145deg, #ffffff, #f8fafc);
+      --loader-border: #cbd5e1;
+      --text-primary: #0f172a;
+      --text-secondary: #64748b;
+      --shadow: rgba(0, 0, 0, 0.15);
     }
 
     :host([active]) {
@@ -20,11 +35,11 @@ template.innerHTML = `
     }
 
     .loader-container {
-      background: linear-gradient(145deg, #1e293b, rgba(30, 41, 59, 0.95));
+      background: var(--loader-bg);
       padding: 40px 50px;
       border-radius: 20px;
-      border: 2px solid #334155;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+      border: 2px solid var(--loader-border);
+      box-shadow: 0 12px 40px var(--shadow);
       text-align: center;
       animation: fadeIn 0.3s ease;
     }
@@ -60,7 +75,7 @@ template.innerHTML = `
     }
 
     .message {
-      color: #e6eef8;
+      color: var(--text-primary);
       font-size: 1rem;
       font-weight: 600;
       margin: 0;
@@ -68,7 +83,7 @@ template.innerHTML = `
     }
 
     .submessage {
-      color: #94a3b8;
+      color: var(--text-secondary);
       font-size: 0.85rem;
       margin: 8px 0 0 0;
     }
