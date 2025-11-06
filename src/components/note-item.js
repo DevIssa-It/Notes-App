@@ -16,6 +16,7 @@ template.innerHTML = `
       position:relative;
       overflow:hidden;
       width:100%;
+      cursor:pointer;
     }
     .note-card::before{
       content:'';
@@ -174,12 +175,20 @@ class NoteItem extends HTMLElement {
     this.onArchive = this.onArchive.bind(this);
     this.onDelete = this.onDelete.bind(this);
     this.onKeydown = this.onKeydown.bind(this);
+    this.onClick = this.onClick.bind(this);
   }
 
   connectedCallback() {
     this.archiveBtn.addEventListener('click', this.onArchive);
     this.deleteBtn.addEventListener('click', this.onDelete);
     this.addEventListener('keydown', this.onKeydown);
+    
+    // Add click listener to the card itself
+    const card = this.shadowRoot.querySelector('.note-card');
+    if (card) {
+      card.addEventListener('click', this.onClick);
+    }
+    
     this.render();
 
     // enter animation
@@ -192,6 +201,11 @@ class NoteItem extends HTMLElement {
     this.archiveBtn.removeEventListener('click', this.onArchive);
     this.deleteBtn.removeEventListener('click', this.onDelete);
     this.removeEventListener('keydown', this.onKeydown);
+    
+    const card = this.shadowRoot.querySelector('.note-card');
+    if (card) {
+      card.removeEventListener('click', this.onClick);
+    }
   }
 
   attributeChangedCallback(name, oldVal, newVal) {
@@ -235,6 +249,24 @@ class NoteItem extends HTMLElement {
     this.dispatchEvent(
       new CustomEvent('note-delete', {
         detail: { id: this.getAttribute('data-id') },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
+  onClick(e) {
+    // Don't navigate if user clicked on a button
+    if (e.target.closest('button')) {
+      return;
+    }
+    
+    this.dispatchEvent(
+      new CustomEvent('note-click', {
+        detail: { 
+          id: this.getAttribute('data-id'),
+          note: this.data,
+        },
         bubbles: true,
         composed: true,
       })

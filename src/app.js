@@ -9,6 +9,7 @@ import './components/note-item.js';
 import './components/note-list.js';
 import './components/loading-indicator.js';
 import './components/search-bar.js';
+import './components/note-detail.js';
 import Swal from 'sweetalert2';
 import NotesAPI from './api.js';
 
@@ -169,6 +170,137 @@ function updateArchivedCount() {
   if (span) span.textContent = String(cnt);
 }
 
+// Show list view
+function showListView() {
+  const mainContainer = document.querySelector('main');
+  const detailContainer = document.getElementById('noteDetailContainer');
+
+  if (mainContainer) {
+    mainContainer.style.display = 'block';
+  }
+
+  if (detailContainer) {
+    detailContainer.style.display = 'none';
+    detailContainer.innerHTML = '';
+  }
+}
+
+// Show detail view
+function showNoteDetail(note) {
+  const mainContainer = document.querySelector('main');
+  if (!mainContainer) return;
+
+  // Hide list view
+  mainContainer.style.display = 'none';
+
+  // Create or get detail view container
+  let detailContainer = document.getElementById('noteDetailContainer');
+  if (!detailContainer) {
+    detailContainer = document.createElement('div');
+    detailContainer.id = 'noteDetailContainer';
+    document.body.appendChild(detailContainer);
+  }
+
+  detailContainer.style.display = 'block';
+  detailContainer.innerHTML = '';
+
+  const noteDetail = document.createElement('note-detail');
+  noteDetail.note = note;
+  detailContainer.appendChild(noteDetail);
+
+  // Listen to back button
+  noteDetail.addEventListener('back', () => {
+    showListView();
+  });
+
+  // Listen to archive button
+  noteDetail.addEventListener('archive', async (e) => {
+    const { noteId } = e.detail;
+    try {
+      showLoading('Archiving note...', 'Please wait');
+      await NotesAPI.archiveNote(noteId);
+      const noteData = notesStore.get(noteId);
+      notesStore.delete(noteId);
+      archivedStore.set(noteId, { ...noteData, archived: true });
+      showSuccess('Note archived!');
+      showListView();
+      const notesGrid = document.getElementById('notesGrid');
+      const archivedGrid = document.getElementById('archivedGrid');
+      renderNotes(notesGrid);
+      renderArchivedSection(archivedGrid);
+      updateArchivedCount();
+    } catch (error) {
+      showError('Failed to archive note', error);
+    } finally {
+      hideLoading();
+    }
+  });
+
+  // Listen to unarchive button
+  noteDetail.addEventListener('unarchive', async (e) => {
+    const { noteId } = e.detail;
+    try {
+      showLoading('Unarchiving note...', 'Please wait');
+      await NotesAPI.unarchiveNote(noteId);
+      const noteData = archivedStore.get(noteId);
+      archivedStore.delete(noteId);
+      notesStore.set(noteId, { ...noteData, archived: false });
+      showSuccess('Note unarchived!');
+      showListView();
+      const notesGrid = document.getElementById('notesGrid');
+      const archivedGrid = document.getElementById('archivedGrid');
+      renderNotes(notesGrid);
+      renderArchivedSection(archivedGrid);
+      updateArchivedCount();
+    } catch (error) {
+      showError('Failed to unarchive note', error);
+    } finally {
+      hideLoading();
+    }
+  });
+
+  // Listen to delete button
+  noteDetail.addEventListener('delete', async (e) => {
+    const { noteId } = e.detail;
+
+    // Confirm before deleting
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc2626',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Yes, delete it!',
+      background: '#1e293b',
+      color: '#e6eef8',
+    });
+
+    if (result.isConfirmed) {
+      try {
+        showLoading('Deleting note...', 'Please wait');
+        await NotesAPI.deleteNote(noteId);
+        notesStore.delete(noteId);
+        archivedStore.delete(noteId);
+        showSuccess('Note deleted!');
+        showListView();
+        const notesGrid = document.getElementById('notesGrid');
+        const archivedGrid = document.getElementById('archivedGrid');
+        renderNotes(notesGrid);
+        renderArchivedSection(archivedGrid);
+        updateArchivedCount();
+      } catch (error) {
+        showError('Failed to delete note', error);
+      } finally {
+        hideLoading();
+      }
+    }
+  });
+
+  // Scroll to top
+  window.scrollTo(0, 0);
+}
+
 function setFilter(filter) {
   currentFilter = filter === 'archived' ? 'archived' : 'all';
   const notesGrid = document.getElementById('notesGrid');
@@ -196,6 +328,12 @@ async function mount() {
   renderNotes(notesGrid);
   renderArchivedSection(archivedGrid);
   updateArchivedCount();
+
+  // Listen to note click (view detail)
+  document.body.addEventListener('note-click', (e) => {
+    const { note } = e.detail;
+    showNoteDetail(note);
+  });
 
   // Listen to search
   document.body.addEventListener('search', (e) => {
