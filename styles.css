@@ -20,6 +20,7 @@
   --white: #e6eef8;
   --text-primary: #e6eef8;
   --text-secondary: #94a3b8;
+  --filter-text: #e6eef8;
   --border-subtle: rgba(148, 163, 184, 0.1);
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
@@ -45,6 +46,7 @@
   --white: #0f172a;
   --text-primary: #0f172a;
   --text-secondary: #475569;
+  --filter-text: #0f172a;
   --border-subtle: rgba(15, 23, 42, 0.08);
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05);
@@ -138,7 +140,7 @@ note-input {
 .filter-btn {
   background: var(--input-bg);
   border: 1px solid var(--card-border);
-  color: #0f172a;
+  color: var(--filter-text) !important;
   padding: 8px 14px;
   border-radius: 10px;
   cursor: pointer;
@@ -149,12 +151,12 @@ note-input {
 .filter-btn:hover {
   background: var(--input-bg-focus);
   border-color: rgba(124, 58, 237, 0.4);
-  color: #0f172a;
+  color: var(--filter-text) !important;
 }
 .filter-btn.active {
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
   border: none;
-  color: white;
+  color: white !important;
   box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
 }
 
@@ -462,6 +464,28 @@ textarea:focus-visible {
   background: rgba(124, 58, 237, 0.15);
   border-color: var(--accent);
   box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
+}
+
+/* Filter button specific - override .btn.ghost */
+.btn.ghost.filter-btn {
+  color: var(--filter-text);
+}
+
+.btn.ghost.filter-btn:hover {
+  color: var(--filter-text);
+}
+
+.btn.ghost.filter-btn.active {
+  color: white;
+}
+
+/* Force dark color for filter buttons in light theme */
+[data-theme='light'] .btn.ghost.filter-btn {
+  color: #0f172a !important;
+}
+
+[data-theme='light'] .btn.ghost.filter-btn:hover {
+  color: #0f172a !important;
 }
 
 /* App bar */
