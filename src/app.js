@@ -38,30 +38,41 @@ function hideLoading() {
   }
 }
 
+// Helper to get current theme colors for SweetAlert
+function getSwalTheme() {
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  return {
+    background: isLight ? '#ffffff' : '#1e293b',
+    color: isLight ? '#0f172a' : '#e6eef8',
+  };
+}
+
 // Helper function to show error
 function showError(message, error) {
   console.error(message, error);
+  const theme = getSwalTheme();
   Swal.fire({
     icon: 'error',
     title: 'Oops...',
     text: message,
     footer: error ? `<small>${error.message}</small>` : '',
     confirmButtonColor: '#7c3aed',
-    background: '#1e293b',
-    color: '#e6eef8',
+    background: theme.background,
+    color: theme.color,
   });
 }
 
 // Helper function to show success
 function showSuccess(message) {
+  const theme = getSwalTheme();
   Swal.fire({
     icon: 'success',
     title: 'Success!',
     text: message,
     timer: 2000,
     showConfirmButton: false,
-    background: '#1e293b',
-    color: '#e6eef8',
+    background: theme.background,
+    color: theme.color,
   });
 }
 
@@ -285,6 +296,7 @@ function showNoteDetail(note) {
     const { noteId } = e.detail;
 
     // Confirm before deleting
+    const theme = getSwalTheme();
     const result = await Swal.fire({
       title: 'Are you sure?',
       text: "You won't be able to revert this!",
@@ -293,8 +305,8 @@ function showNoteDetail(note) {
       confirmButtonColor: '#dc2626',
       cancelButtonColor: '#64748b',
       confirmButtonText: 'Yes, delete it!',
-      background: '#1e293b',
-      color: '#e6eef8',
+      background: theme.background,
+      color: theme.color,
     });
 
     if (result.isConfirmed) {
@@ -460,6 +472,7 @@ async function mount() {
     const { id } = e.detail;
 
     // Confirm before deleting
+    const theme = getSwalTheme();
     const result = await Swal.fire({
       title: 'Are you sure?',
       text: "You won't be able to revert this!",
@@ -468,8 +481,8 @@ async function mount() {
       confirmButtonColor: '#dc2626',
       cancelButtonColor: '#64748b',
       confirmButtonText: 'Yes, delete it!',
-      background: '#1e293b',
-      color: '#e6eef8',
+      background: theme.background,
+      color: theme.color,
     });
 
     if (result.isConfirmed) {
@@ -495,12 +508,13 @@ async function mount() {
     restoreAllBtn.addEventListener('click', async () => {
       const archivedIds = Array.from(archivedStore.keys());
       if (archivedIds.length === 0) {
+        const theme = getSwalTheme();
         Swal.fire({
           icon: 'info',
           title: 'No archived notes',
           text: 'There are no archived notes to restore',
-          background: '#1e293b',
-          color: '#e6eef8',
+          background: theme.background,
+          color: theme.color,
         });
         return;
       }
@@ -535,16 +549,18 @@ async function mount() {
     deleteAllArchivedBtn.addEventListener('click', async () => {
       const archivedIds = Array.from(archivedStore.keys());
       if (archivedIds.length === 0) {
+        const theme = getSwalTheme();
         Swal.fire({
           icon: 'info',
           title: 'No archived notes',
           text: 'There are no archived notes to delete',
-          background: '#1e293b',
-          color: '#e6eef8',
+          background: theme.background,
+          color: theme.color,
         });
         return;
       }
 
+      const theme = getSwalTheme();
       const result = await Swal.fire({
         title: 'Delete all archived notes?',
         text: `This will permanently delete ${archivedIds.length} archived notes!`,
@@ -553,8 +569,8 @@ async function mount() {
         confirmButtonColor: '#dc2626',
         cancelButtonColor: '#64748b',
         confirmButtonText: 'Yes, delete all!',
-        background: '#1e293b',
-        color: '#e6eef8',
+        background: theme.background,
+        color: theme.color,
       });
 
       if (result.isConfirmed) {
@@ -610,12 +626,13 @@ async function mount() {
   });
 
   document.body.addEventListener('import-notes', () => {
+    const theme = getSwalTheme();
     Swal.fire({
       icon: 'info',
       title: 'Import Not Available',
       text: 'Import feature is disabled when using API mode. Please use the API to manage your notes.',
-      background: '#1e293b',
-      color: '#e6eef8',
+      background: theme.background,
+      color: theme.color,
     });
   });
 
