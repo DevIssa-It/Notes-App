@@ -1,6 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 
-:root {
+/* Dark Theme (Default) */
+:root,
+[data-theme='dark'] {
   --bg: #0f172a; /* deep navy */
   --card: #1e293b;
   --card-border: #334155;
@@ -14,6 +16,23 @@
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* Light Theme */
+[data-theme='light'] {
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --card-border: #e2e8f0;
+  --muted: #64748b;
+  --accent: #7c3aed;
+  --accent-2: #0ea5e9;
+  --accent-hover: #6d28d9;
+  --surface: #ffffff;
+  --white: #0f172a;
+  --border-subtle: rgba(15, 23, 42, 0.1);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
 
 * {
@@ -46,8 +65,9 @@ body {
     Roboto,
     'Helvetica Neue',
     Arial;
-  background: linear-gradient(180deg, var(--bg), #071028);
+  background: linear-gradient(180deg, var(--bg), var(--surface));
   color: var(--white);
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 app-bar {

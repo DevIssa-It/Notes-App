@@ -217,6 +217,19 @@ class NoteDetail extends HTMLElement {
           box-shadow: 0 8px 16px rgba(34, 197, 94, 0.3);
         }
 
+        .edit-button {
+          background: rgba(59, 130, 246, 0.2);
+          color: #3b82f6;
+          border: 1px solid #3b82f6;
+        }
+
+        .edit-button:hover {
+          background: #3b82f6;
+          color: white;
+          transform: translateY(-2px);
+          box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+        }
+
         .delete-button {
           background: rgba(239, 68, 68, 0.2);
           color: #ef4444;
@@ -288,6 +301,10 @@ class NoteDetail extends HTMLElement {
           <div class="note-body">${this._escapeHtml(this._note.body)}</div>
 
           <div class="actions">
+            <button class="action-button edit-button" id="editButton">
+              <i class="fas fa-edit"></i>
+              Edit Note
+            </button>
             ${this._note.archived
     ? '<button class="action-button unarchive-button" id="unarchiveButton"><i class="fas fa-box-open"></i>Unarchive Note</button>'
     : '<button class="action-button archive-button" id="archiveButton"><i class="fas fa-archive"></i>Archive Note</button>'
@@ -306,6 +323,7 @@ class NoteDetail extends HTMLElement {
 
   _attachEventListeners() {
     const backButton = this.shadowRoot.getElementById('backButton');
+    const editButton = this.shadowRoot.getElementById('editButton');
     const archiveButton = this.shadowRoot.getElementById('archiveButton');
     const unarchiveButton = this.shadowRoot.getElementById('unarchiveButton');
     const deleteButton = this.shadowRoot.getElementById('deleteButton');
@@ -313,6 +331,14 @@ class NoteDetail extends HTMLElement {
     if (backButton) {
       backButton.addEventListener('click', () => {
         this.dispatchEvent(new CustomEvent('back'));
+      });
+    }
+
+    if (editButton) {
+      editButton.addEventListener('click', () => {
+        this.dispatchEvent(new CustomEvent('edit', {
+          detail: { note: this._note },
+        }));
       });
     }
 

@@ -89,6 +89,7 @@ template.innerHTML = `
       <div class="app-title">Notes App</div>
     </div>
     <div class="actions">
+      <theme-toggle></theme-toggle>
       <button class="btn exportBtn" title="Export notes as JSON">
         <i class="fas fa-download"></i> Export
       </button>

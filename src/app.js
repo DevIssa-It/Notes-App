@@ -10,6 +10,8 @@ import './components/note-list.js';
 import './components/loading-indicator.js';
 import './components/search-bar.js';
 import './components/note-detail.js';
+import './components/note-edit-modal.js';
+import './components/theme-toggle.js';
 import Swal from 'sweetalert2';
 import NotesAPI from './api.js';
 
@@ -185,6 +187,19 @@ function showListView() {
   }
 }
 
+// Show edit modal
+function showEditModal(note) {
+  let editModal = document.querySelector('note-edit-modal');
+  
+  if (!editModal) {
+    editModal = document.createElement('note-edit-modal');
+    document.body.appendChild(editModal);
+  }
+
+  editModal.note = note;
+  editModal.open();
+}
+
 // Show detail view
 function showNoteDetail(note) {
   const mainContainer = document.querySelector('main');
@@ -211,6 +226,12 @@ function showNoteDetail(note) {
   // Listen to back button
   noteDetail.addEventListener('back', () => {
     showListView();
+  });
+
+  // Listen to edit button
+  noteDetail.addEventListener('edit', (e) => {
+    const { note: noteToEdit } = e.detail;
+    showEditModal(noteToEdit);
   });
 
   // Listen to archive button
@@ -356,6 +377,45 @@ async function mount() {
       showSuccess('Note created successfully!');
     } catch (error) {
       showError('Failed to create note', error);
+    } finally {
+      hideLoading();
+    }
+  });
+
+  // Listen to edit (update note)
+  document.body.addEventListener('note-updated', async (e) => {
+    const { id, title, body, archived } = e.detail;
+    try {
+      showLoading('Updating note...', 'Saving changes');
+      
+      // API Dicoding doesn't have UPDATE endpoint, so we delete and recreate
+      await NotesAPI.deleteNote(id);
+      const newNote = await NotesAPI.createNote({ title, body });
+      
+      // If it was archived, archive the new note
+      if (archived) {
+        await NotesAPI.archiveNote(newNote.id);
+        archivedStore.delete(id);
+        archivedStore.set(newNote.id, { ...newNote, archived: true });
+      } else {
+        notesStore.delete(id);
+        notesStore.set(newNote.id, { ...newNote, archived: false });
+      }
+      
+      renderNotes(notesGrid);
+      renderArchivedSection(archivedGrid);
+      showSuccess('Note updated successfully!');
+      
+      // Refresh detail view if open
+      const detailContainer = document.getElementById('noteDetailContainer');
+      if (detailContainer && detailContainer.style.display !== 'none') {
+        const updatedNote = archived 
+          ? archivedStore.get(newNote.id) 
+          : notesStore.get(newNote.id);
+        showNoteDetail(updatedNote);
+      }
+    } catch (error) {
+      showError('Failed to update note', error);
     } finally {
       hideLoading();
     }
@@ -583,5 +643,19 @@ async function mount() {
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', mount);
 } else mount();
+
+// Register Service Worker for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('/service-worker.js')
+      .then((registration) => {
+        console.log('ServiceWorker registered:', registration);
+      })
+      .catch((error) => {
+        console.log('ServiceWorker registration failed:', error);
+      });
+  });
+}
 
 export { notesStore, archivedStore };

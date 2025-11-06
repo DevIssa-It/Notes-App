@@ -7,8 +7,14 @@ build/
 
 # Config files
 webpack.config.js
+webpack.common.js
+webpack.dev.js
+webpack.prod.js
 .prettierrc
 .eslintrc.js
+
+# Service Worker
+service-worker.js
 
 # Test files
 *.test.js
