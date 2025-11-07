@@ -1,15 +1,16 @@
 const template = document.createElement('template');
 template.innerHTML = `
   <style>
-    :host{
+    :host {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
       gap: 20px;
       align-items: start;
     }
-    ::slotted(note-item){
-      display: block;
+    ::slotted(note-item) {
+      display: flex;
       width: 100%;
+      min-width: 0;
     }
   </style>
   <slot></slot>
