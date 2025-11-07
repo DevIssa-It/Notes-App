@@ -24,7 +24,15 @@ const loadingManager = new LoadingManager();
 export async function handleCreateNote(detail, onSuccess) {
   try {
     loadingManager.show(MESSAGES.LOADING.CREATING, 'Saving to server');
-    const newNote = await NotesAPI.createNote(detail.title, detail.body);
+    const newNote = await NotesAPI.createNote({
+      title: detail.title,
+      body: detail.body,
+    });
+    
+    if (!newNote || !newNote.id) {
+      throw new Error('Invalid note returned from API');
+    }
+    
     addNote(newNote);
     showSuccess(MESSAGES.SUCCESS.NOTE_CREATED);
     if (onSuccess) onSuccess();
@@ -44,7 +52,10 @@ export async function handleCreateNote(detail, onSuccess) {
 export async function handleUpdateNote(id, updates, onSuccess) {
   try {
     loadingManager.show(MESSAGES.LOADING.UPDATING, 'Saving changes');
-    await NotesAPI.updateNote(id, updates.title, updates.body);
+    await NotesAPI.updateNote(id, {
+      title: updates.title,
+      body: updates.body,
+    });
     updateNote(id, updates);
     showSuccess(MESSAGES.SUCCESS.NOTE_UPDATED);
     if (onSuccess) onSuccess();

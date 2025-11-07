@@ -72,6 +72,29 @@ class NotesAPI {
     }
   }
 
+  static async updateNote(id, { title, body }) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/notes/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title, body }),
+      });
+
+      const responseJson = await response.json();
+
+      if (responseJson.error) {
+        throw new Error(responseJson.message);
+      }
+
+      return responseJson.data;
+    } catch (error) {
+      console.error('Error updating note:', error);
+      throw error;
+    }
+  }
+
   static async deleteNote(id) {
     try {
       const response = await fetch(`${API_BASE_URL}/notes/${id}`, {
