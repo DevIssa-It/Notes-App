@@ -137,7 +137,6 @@ async function mount() {
   await loadNotesFromAPI();
 
   // Get DOM elements
-  const noteInput = document.querySelector('note-input');
   const noteDetail = document.querySelector('note-detail');
   const editModal = document.querySelector('note-edit-modal');
   const restoreAllBtn = document.getElementById('restoreAllBtn');
@@ -155,11 +154,9 @@ async function mount() {
   });
 
   // Note creation
-  if (noteInput) {
-    noteInput.addEventListener('note-add', async (e) => {
-      await handleCreateNote(e.detail, refreshViews);
-    });
-  }
+  document.body.addEventListener('note-add', async (e) => {
+    await handleCreateNote(e.detail, refreshViews);
+  });
 
   // Note editing
   if (editModal) {
