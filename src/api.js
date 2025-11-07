@@ -72,25 +72,32 @@ class NotesAPI {
     }
   }
 
-  static async updateNote(id, { title, body }) {
+  /**
+   * Update note by deleting old and creating new one
+   * This is a workaround because Dicoding API doesn't have PUT endpoint
+   * @param {string} id - Note ID to update
+   * @param {Object} data - Note data with title and body
+   * @param {boolean} wasArchived - Whether the note was archived before update
+   * @returns {Promise<Object>} The newly created note
+   */
+  static async updateNote(id, { title, body }, wasArchived = false) {
     try {
-      const response = await fetch(`${API_BASE_URL}/notes/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ title, body }),
-      });
-
-      const responseJson = await response.json();
-
-      if (responseJson.error) {
-        throw new Error(responseJson.message);
+      // Delete the old note
+      await this.deleteNote(id);
+      
+      // Create new note with updated data
+      const newNote = await this.createNote({ title, body });
+      
+      // If the note was archived, archive the new one
+      if (wasArchived) {
+        await this.archiveNote(newNote.id);
+        // Fetch the note again to get the archived status
+        return await this.getSingleNote(newNote.id);
       }
-
-      return responseJson.data;
+      
+      return newNote;
     } catch (error) {
-      console.error('Error updating note:', error);
+      console.error('Error updating note (delete + create):', error);
       throw error;
     }
   }

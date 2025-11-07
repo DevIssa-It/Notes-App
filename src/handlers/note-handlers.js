@@ -7,7 +7,6 @@ import { MESSAGES } from '../constants.js';
 import { showError, showSuccess, showSuccessWithUndo, LoadingManager } from '../ui-helpers.js';
 import {
   addNote,
-  updateNote,
   deleteNote,
   getNoteById,
   archiveNote as archiveNoteInStore,
@@ -47,6 +46,7 @@ export async function handleCreateNote(detail, onSuccess) {
 
 /**
  * Handle note update
+ * Uses delete + create strategy since Dicoding API doesn't support PUT
  * @param {string} id - Note ID
  * @param {Object} updates - Note updates
  * @param {Function} onSuccess - Success callback
@@ -54,13 +54,41 @@ export async function handleCreateNote(detail, onSuccess) {
 export async function handleUpdateNote(id, updates, onSuccess) {
   try {
     loadingManager.show(MESSAGES.LOADING.UPDATING, 'Saving changes');
-    await NotesAPI.updateNote(id, {
-      title: updates.title,
-      body: updates.body,
-    });
-    updateNote(id, updates);
+    
+    // Get the original note to check if it's archived
+    const originalNote = getNoteById(id);
+    if (!originalNote) {
+      throw new Error('Note not found');
+    }
+    
+    const wasArchived = originalNote.archived || false;
+    
+    // Delete old note and create new one (API workaround)
+    const updatedNote = await NotesAPI.updateNote(
+      id, 
+      {
+        title: updates.title,
+        body: updates.body,
+      },
+      wasArchived
+    );
+    
+    if (!updatedNote || !updatedNote.id) {
+      throw new Error('Failed to update note');
+    }
+    
+    // Remove old note from store
+    deleteNote(id);
+    
+    // Add updated note to correct store
+    if (wasArchived) {
+      archiveNoteInStore(updatedNote.id);
+    } else {
+      addNote(updatedNote);
+    }
+    
     showSuccess(MESSAGES.SUCCESS.NOTE_UPDATED);
-    if (onSuccess) onSuccess();
+    if (onSuccess) onSuccess(updatedNote);
   } catch (error) {
     showError(MESSAGES.ERROR.UPDATE_FAILED, error);
   } finally {

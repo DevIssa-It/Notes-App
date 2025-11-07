@@ -198,10 +198,13 @@ async function mount() {
   // Note editing
   if (editModal) {
     editModal.addEventListener('save', async (e) => {
-      await handleUpdateNote(e.detail.id, e.detail, () => {
+      await handleUpdateNote(e.detail.id, e.detail, (updatedNote) => {
         refreshViews();
-        const updatedNote = getNoteById(e.detail.id);
-        if (updatedNote) showNoteDetail(updatedNote);
+        // Use the new note ID since we delete old and create new
+        if (updatedNote && updatedNote.id) {
+          const freshNote = getNoteById(updatedNote.id);
+          if (freshNote) showNoteDetail(freshNote);
+        }
       });
     });
   }
