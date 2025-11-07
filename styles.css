@@ -93,6 +93,14 @@ app-bar {
   display: block;
 }
 
+/* Note Detail Container */
+#noteDetailContainer {
+  display: none;
+  max-width: 1100px;
+  margin: 24px auto;
+  padding: 0 16px;
+}
+
 .container {
   max-width: 1100px;
   margin: 24px auto;

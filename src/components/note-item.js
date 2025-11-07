@@ -313,7 +313,10 @@ class NoteItem extends HTMLElement {
 
   onClick(e) {
     // Don't navigate if user clicked on a button
-    if (e.target.closest('button')) {
+    const path = e.composedPath();
+    const isButton = path.some(el => el.tagName === 'BUTTON');
+    
+    if (isButton) {
       return;
     }
     
@@ -321,7 +324,7 @@ class NoteItem extends HTMLElement {
       new CustomEvent('note-click', {
         detail: { 
           id: this.getAttribute('data-id'),
-          note: this.data,
+          note: this.note,
         },
         bubbles: true,
         composed: true,
