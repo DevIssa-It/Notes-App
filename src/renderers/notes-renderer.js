@@ -74,13 +74,11 @@ export function renderNotes(container, notes) {
     return;
   }
 
-  const noteList = document.createElement('note-list');
   arr.forEach((noteData) => {
     const noteItem = document.createElement('note-item');
     noteItem.note = noteData;
-    noteList.appendChild(noteItem);
+    container.appendChild(noteItem);
   });
-  container.appendChild(noteList);
 }
 
 /**
@@ -112,13 +110,11 @@ export function renderArchivedSection(container, archivedNotes) {
     return;
   }
 
-  const noteList = document.createElement('note-list');
   arr.forEach((noteData) => {
     const noteItem = document.createElement('note-item');
     noteItem.note = noteData;
-    noteList.appendChild(noteItem);
+    container.appendChild(noteItem);
   });
-  container.appendChild(noteList);
 }
 
 /**
