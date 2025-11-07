@@ -25,16 +25,9 @@ class NoteDetail extends HTMLElement {
           :host {
             display: block;
             min-height: 100vh;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            color: #e6eef8;
+            background: linear-gradient(180deg, var(--bg), var(--bg-gradient-end));
+            color: var(--text-primary);
             padding: 2rem;
-            --text-muted: #94a3b8;
-          }
-
-          :host-context([data-theme='light']) {
-            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-            color: #0f172a;
-            --text-muted: #64748b;
           }
 
           .loading {
@@ -43,7 +36,7 @@ class NoteDetail extends HTMLElement {
             align-items: center;
             min-height: 50vh;
             font-size: 1.2rem;
-            color: var(--text-muted);
+            color: var(--text-secondary);
           }
         </style>
         <div class="loading">Loading note details...</div>
@@ -62,21 +55,8 @@ class NoteDetail extends HTMLElement {
         :host {
           display: block;
           min-height: 100vh;
-          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-          color: #e6eef8;
-          --bg-card: rgba(30, 41, 59, 0.5);
-          --border-color: #334155;
-          --text-primary: #e6eef8;
-          --text-muted: #94a3b8;
-        }
-
-        :host-context([data-theme='light']) {
-          background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-          color: #0f172a;
-          --bg-card: rgba(255, 255, 255, 0.8);
-          --border-color: #cbd5e1;
-          --text-primary: #0f172a;
-          --text-muted: #64748b;
+          background: linear-gradient(180deg, var(--bg), var(--bg-gradient-end));
+          color: var(--text-primary);
         }
 
         .container {
@@ -91,7 +71,7 @@ class NoteDetail extends HTMLElement {
           gap: 1rem;
           margin-bottom: 2rem;
           padding-bottom: 1rem;
-          border-bottom: 2px solid var(--border-color);
+          border-bottom: 2px solid var(--card-border);
         }
 
         .back-button {
@@ -119,11 +99,11 @@ class NoteDetail extends HTMLElement {
         }
 
         .note-content {
-          background: var(--bg-card);
+          background: var(--card-gradient);
           border-radius: 12px;
           padding: 2rem;
           backdrop-filter: blur(10px);
-          border: 1px solid var(--border-color);
+          border: 1px solid var(--card-border);
         }
 
         .note-title {
@@ -143,14 +123,14 @@ class NoteDetail extends HTMLElement {
           gap: 1.5rem;
           margin-bottom: 2rem;
           padding-bottom: 1.5rem;
-          border-bottom: 1px solid var(--border-color);
+          border-bottom: 1px solid var(--card-border);
         }
 
         .meta-item {
           display: flex;
           align-items: center;
           gap: 0.5rem;
-          color: var(--text-muted);
+          color: var(--text-secondary);
           font-size: 0.9rem;
         }
 
@@ -193,7 +173,7 @@ class NoteDetail extends HTMLElement {
           gap: 1rem;
           margin-top: 2rem;
           padding-top: 2rem;
-          border-top: 1px solid var(--border-color);
+          border-top: 1px solid var(--card-border);
         }
 
         .action-button {

@@ -383,10 +383,10 @@ note-item:focus {
 }
 
 .note-card {
-  background: var(--card-gradient);
+  background: var(--card-gradient) !important;
   padding: 20px;
   border-radius: 16px;
-  border: 2px solid var(--card-border);
+  border: 2px solid var(--card-border) !important;
   box-shadow: var(--shadow-md);
   min-height: 140px;
   display: flex;
@@ -608,8 +608,8 @@ textarea:focus-visible {
   gap: 16px;
   padding: 24px;
   border-radius: 18px;
-  background: var(--card-gradient);
-  border: 2px solid var(--card-border);
+  background: var(--card-gradient) !important;
+  border: 2px solid var(--card-border) !important;
   box-shadow: var(--shadow-md);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
@@ -621,9 +621,9 @@ textarea:focus-visible {
 }
 .note-form input[type='text'],
 .note-form textarea {
-  background: var(--input-bg);
-  border: 2px solid var(--input-border);
-  color: var(--text-primary);
+  background: var(--input-bg) !important;
+  border: 2px solid var(--input-border) !important;
+  color: var(--text-primary) !important;
   padding: 14px 16px;
   border-radius: 14px;
   resize: vertical;
@@ -636,8 +636,8 @@ textarea:focus-visible {
 .note-form input[type='text']:focus,
 .note-form textarea:focus {
   outline: none;
-  border-color: var(--input-border-focus);
-  background: var(--input-bg-focus);
+  border-color: var(--input-border-focus) !important;
+  background: var(--input-bg-focus) !important;
   box-shadow:
     0 0 0 4px rgba(124, 58, 237, 0.2),
     var(--shadow-sm);
@@ -646,12 +646,12 @@ textarea:focus-visible {
 
 .note-form input[type='text']:hover,
 .note-form textarea:hover {
-  border-color: rgba(124, 58, 237, 0.4);
+  border-color: rgba(124, 58, 237, 0.4) !important;
 }
 
 .note-form input[type='text']::placeholder,
 .note-form textarea::placeholder {
-  color: var(--text-secondary);
+  color: var(--text-secondary) !important;
   opacity: 0.6;
 }
 
