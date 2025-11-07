@@ -190,7 +190,7 @@ template.innerHTML = `
 
 class NoteItem extends HTMLElement {
   static get observedAttributes() {
-    return ['data-id', 'archived', 'title', 'body', 'created-at'];
+    return ['data-id', 'archived', 'created-at'];
   }
 
   constructor() {
@@ -243,32 +243,55 @@ class NoteItem extends HTMLElement {
     if (oldVal !== newVal) this.render();
   }
 
-  set data(note) {
-    this._data = note;
-    this.setAttribute('data-id', note.id);
-    if (note.archived) this.setAttribute('archived', 'true');
-    else this.removeAttribute('archived');
-    if (note.title) this.setAttribute('title', note.title);
-    if (note.body) this.setAttribute('body', note.body);
-    if (note.createdAt) this.setAttribute('created-at', note.createdAt);
+  set note(noteData) {
+    if (!noteData) return;
+    
+    this._data = noteData;
+    this.setAttribute('data-id', noteData.id);
+    
+    if (noteData.archived) {
+      this.setAttribute('archived', 'true');
+    } else {
+      this.removeAttribute('archived');
+    }
+    
+    // Use dataset to store title and body to avoid conflicts
+    this.dataset.noteTitle = noteData.title || '';
+    this.dataset.noteBody = noteData.body || '';
+    
+    if (noteData.createdAt) {
+      this.setAttribute('created-at', noteData.createdAt);
+    }
+    
     this.render();
   }
 
-  get data() {
-    return (
-      this._data || {
-        id: this.getAttribute('data-id'),
-        title: this.getAttribute('title'),
-        body: this.getAttribute('body'),
-        createdAt: this.getAttribute('created-at'),
-        archived: this.hasAttribute('archived'),
-      }
-    );
+  get note() {
+    return this._data || {
+      id: this.getAttribute('data-id'),
+      title: this.dataset.noteTitle || '',
+      body: this.dataset.noteBody || '',
+      createdAt: this.getAttribute('created-at'),
+      archived: this.hasAttribute('archived'),
+    };
   }
 
-  onArchive() {
+  set data(note) {
+    this.note = note;
+  }
+
+  get data() {
+    return this.note;
+  }
+
+  onArchive(e) {
+    e.stopPropagation(); // Prevent card click event
+    
+    const isArchived = this.hasAttribute('archived');
+    const eventName = isArchived ? 'note-unarchive' : 'note-archive';
+    
     this.dispatchEvent(
-      new CustomEvent('note-archive', {
+      new CustomEvent(eventName, {
         detail: { id: this.getAttribute('data-id') },
         bubbles: true,
         composed: true,
@@ -276,7 +299,9 @@ class NoteItem extends HTMLElement {
     );
   }
 
-  onDelete() {
+  onDelete(e) {
+    e.stopPropagation(); // Prevent card click event
+    
     this.dispatchEvent(
       new CustomEvent('note-delete', {
         detail: { id: this.getAttribute('data-id') },
@@ -315,14 +340,19 @@ class NoteItem extends HTMLElement {
   }
 
   render() {
-    const n = this.data || {};
-    this.titleEl.textContent = n.title || this.getAttribute('title') || '';
-    this.bodyEl.textContent = n.body || this.getAttribute('body') || '';
+    const n = this.note;
+    
+    // Render title and body from cached data
+    this.titleEl.textContent = n.title || '';
+    this.bodyEl.textContent = n.body || '';
+    
+    // Render created date
     const createdAt = n.createdAt || this.getAttribute('created-at');
     this.createdEl.textContent = createdAt
       ? new Date(createdAt).toLocaleString()
       : '';
-    // update archived state and button label
+    
+    // Update archived state and button label
     const btnText = this.archiveBtn.querySelector('.btn-text');
     const btnIcon = this.archiveBtn.querySelector('i');
     if (this.hasAttribute('archived')) {
@@ -335,14 +365,9 @@ class NoteItem extends HTMLElement {
       if (btnIcon) btnIcon.className = 'fas fa-archive';
     }
 
-    // update accessible label on host
-    const snippet = (n.body || this.getAttribute('body') || '')
-      .slice(0, 60)
-      .replace(/\n/g, ' ');
-    this.setAttribute(
-      'aria-label',
-      `${n.title || this.getAttribute('title') || 'Note'} — ${snippet}`
-    );
+    // Update accessible label on host
+    const snippet = (n.body || '').slice(0, 60).replace(/\n/g, ' ');
+    this.setAttribute('aria-label', `${n.title || 'Note'} — ${snippet}`);
   }
 }
 
