@@ -89,15 +89,24 @@ export async function handleDeleteNote(id, onSuccess) {
     showSuccessWithUndo(MESSAGES.SUCCESS.NOTE_DELETED, async () => {
       try {
         loadingManager.show(MESSAGES.LOADING.RESTORING, MESSAGES.WAIT);
-        const restored = await NotesAPI.createNote(
-          deletedNote.title,
-          deletedNote.body
-        );
+        const restored = await NotesAPI.createNote({
+          title: deletedNote.title,
+          body: deletedNote.body,
+        });
+        
+        if (!restored || !restored.id) {
+          throw new Error('Failed to restore note');
+        }
+        
         if (wasArchived) {
           await NotesAPI.archiveNote(restored.id);
-          archiveNoteInStore(restored.id);
+          // Fetch complete note after archiving
+          const completeNote = await NotesAPI.getSingleNote(restored.id);
+          archiveNoteInStore(completeNote.id);
         } else {
-          addNote(restored);
+          // Fetch complete note
+          const completeNote = await NotesAPI.getSingleNote(restored.id);
+          addNote(completeNote);
         }
         showSuccess(MESSAGES.SUCCESS.NOTE_RESTORED);
         if (onSuccess) onSuccess();

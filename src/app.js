@@ -54,6 +54,21 @@ import { MESSAGES } from './constants.js';
 import { showError, showConfirm } from './ui-helpers.js';
 
 /**
+ * Refresh all views
+ */
+function refreshViews() {
+  const notesGrid = document.getElementById('notesGrid');
+  const archivedGrid = document.getElementById('archivedGrid');
+
+  renderNotes(notesGrid, getActiveNotes());
+  renderArchivedSection(archivedGrid, getArchivedNotes());
+  
+  const stats = getStats();
+  updateArchivedCount(stats.archivedCount);
+  updateStats(stats);
+}
+
+/**
  * Show list view (hide detail view)
  */
 function showListView() {
@@ -94,22 +109,45 @@ function showNoteDetail(note) {
 
   const noteDetail = document.createElement('note-detail');
   noteDetail.note = note;
-  detailContainer.appendChild(noteDetail);
-}
-
-/**
- * Refresh all views
- */
-function refreshViews() {
-  const notesGrid = document.getElementById('notesGrid');
-  const archivedGrid = document.getElementById('archivedGrid');
-
-  renderNotes(notesGrid, getActiveNotes());
-  renderArchivedSection(archivedGrid, getArchivedNotes());
   
-  const stats = getStats();
-  updateArchivedCount(stats.archivedCount);
-  updateStats(stats);
+  // Attach event listeners to the newly created note-detail
+  noteDetail.addEventListener('back', showListView);
+
+  noteDetail.addEventListener('edit', (e) => {
+    const noteToEdit = getNoteById(e.detail.noteId);
+    if (noteToEdit) showEditModal(noteToEdit);
+  });
+
+  noteDetail.addEventListener('archive', async (e) => {
+    await handleArchiveNote(e.detail.noteId, () => {
+      showListView();
+      refreshViews();
+    });
+  });
+
+  noteDetail.addEventListener('unarchive', async (e) => {
+    await handleUnarchiveNote(e.detail.noteId, () => {
+      showListView();
+      refreshViews();
+    });
+  });
+
+  noteDetail.addEventListener('delete', async (e) => {
+    const confirmed = await showConfirm(
+      'Are you sure?',
+      "You won't be able to revert this!",
+      'Yes, delete it!'
+    );
+
+    if (confirmed) {
+      await handleDeleteNote(e.detail.noteId, () => {
+        showListView();
+        refreshViews();
+      });
+    }
+  });
+  
+  detailContainer.appendChild(noteDetail);
 }
 
 /**
@@ -137,7 +175,6 @@ async function mount() {
   await loadNotesFromAPI();
 
   // Get DOM elements
-  const noteDetail = document.querySelector('note-detail');
   const editModal = document.querySelector('note-edit-modal');
   const restoreAllBtn = document.getElementById('restoreAllBtn');
   const deleteAllArchivedBtn = document.getElementById('deleteAllArchivedBtn');
@@ -169,44 +206,7 @@ async function mount() {
     });
   }
 
-  // Note detail view events
-  if (noteDetail) {
-    noteDetail.addEventListener('back', showListView);
-
-    noteDetail.addEventListener('edit', (e) => {
-      const note = getNoteById(e.detail.noteId);
-      if (note) showEditModal(note);
-    });
-
-    noteDetail.addEventListener('archive', async (e) => {
-      await handleArchiveNote(e.detail.noteId, () => {
-        showListView();
-        refreshViews();
-      });
-    });
-
-    noteDetail.addEventListener('unarchive', async (e) => {
-      await handleUnarchiveNote(e.detail.noteId, () => {
-        showListView();
-        refreshViews();
-      });
-    });
-
-    noteDetail.addEventListener('delete', async (e) => {
-      const confirmed = await showConfirm(
-        'Are you sure?',
-        "You won't be able to revert this!",
-        'Yes, delete it!'
-      );
-
-      if (confirmed) {
-        await handleDeleteNote(e.detail.noteId, () => {
-          showListView();
-          refreshViews();
-        });
-      }
-    });
-  }
+  // Note detail view events are now handled in showNoteDetail() function
 
   // Note item click (show detail)
   document.body.addEventListener('note-click', (e) => {

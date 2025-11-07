@@ -350,14 +350,19 @@ class NoteDetail extends HTMLElement {
 
     if (backButton) {
       backButton.addEventListener('click', () => {
-        this.dispatchEvent(new CustomEvent('back'));
+        this.dispatchEvent(new CustomEvent('back', {
+          bubbles: true,
+          composed: true,
+        }));
       });
     }
 
     if (editButton) {
       editButton.addEventListener('click', () => {
         this.dispatchEvent(new CustomEvent('edit', {
-          detail: { note: this._note },
+          detail: { noteId: this._note.id },
+          bubbles: true,
+          composed: true,
         }));
       });
     }
@@ -366,6 +371,8 @@ class NoteDetail extends HTMLElement {
       archiveButton.addEventListener('click', () => {
         this.dispatchEvent(new CustomEvent('archive', {
           detail: { noteId: this._note.id },
+          bubbles: true,
+          composed: true,
         }));
       });
     }
@@ -374,6 +381,8 @@ class NoteDetail extends HTMLElement {
       unarchiveButton.addEventListener('click', () => {
         this.dispatchEvent(new CustomEvent('unarchive', {
           detail: { noteId: this._note.id },
+          bubbles: true,
+          composed: true,
         }));
       });
     }
@@ -382,6 +391,8 @@ class NoteDetail extends HTMLElement {
       deleteButton.addEventListener('click', () => {
         this.dispatchEvent(new CustomEvent('delete', {
           detail: { noteId: this._note.id },
+          bubbles: true,
+          composed: true,
         }));
       });
     }
