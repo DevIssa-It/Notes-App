@@ -418,7 +418,7 @@ class NoteEditModal extends HTMLElement {
     }
 
     this.dispatchEvent(
-      new CustomEvent('note-updated', {
+      new CustomEvent('save', {
         detail: {
           id: this._note.id,
           title,

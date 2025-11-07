@@ -80,8 +80,11 @@ export async function handleUpdateNote(id, updates, onSuccess) {
     // Remove old note from store
     deleteNote(id);
     
-    // Add updated note to correct store
-    if (wasArchived) {
+    // Add updated note to correct store based on archived status
+    // The note from API already has the correct archived property
+    if (updatedNote.archived) {
+      // For archived notes, we need to add to active store first, then move to archived
+      addNote(updatedNote);
       archiveNoteInStore(updatedNote.id);
     } else {
       addNote(updatedNote);
