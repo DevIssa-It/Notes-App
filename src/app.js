@@ -14,479 +14,226 @@ import './components/note-edit-modal.js';
 import './components/theme-toggle.js';
 import './components/note-stats.js';
 
-// Import utilities
-import NotesAPI from './api.js';
-import { MESSAGES, FILTERS } from './constants.js';
+// Import state management
 import {
-  showError,
-  showSuccess,
-  showSuccessWithUndo,
-  showConfirm,
-  LoadingManager,
-} from './ui-helpers.js';
+  loadNotesFromAPI,
+  getActiveNotes,
+  getArchivedNotes,
+  getNoteById,
+  getStats,
+} from './state/notes-store.js';
 
-// Application State
-const notesStore = new Map();
-const archivedStore = new Map();
-let currentFilter = FILTERS.ALL;
-let currentSearchQuery = '';
-const loadingManager = new LoadingManager();
+// Import renderers
+import {
+  renderNotes,
+  renderArchivedSection,
+  updateArchivedCount,
+  updateStats,
+  setSearchQuery,
+  setCurrentFilter,
+  getCurrentFilter,
+} from './renderers/notes-renderer.js';
 
-/**
- * Show loading indicator
- * @param {string} message - Loading message
- * @param {string} submessage - Loading submessage
- */
-function showLoading(message = MESSAGES.LOADING.DEFAULT, submessage = MESSAGES.WAIT) {
-  loadingManager.show(message, submessage);
-}
+// Import handlers
+import {
+  handleCreateNote,
+  handleUpdateNote,
+  handleDeleteNote,
+  handleArchiveNote,
+  handleUnarchiveNote,
+} from './handlers/note-handlers.js';
 
-/**
- * Hide loading indicator
- */
-function hideLoading() {
-  loadingManager.hide();
-}
+import {
+  handleRestoreAll,
+  handleDeleteAll,
+  handleExportNotes,
+} from './handlers/bulk-handlers.js';
 
-/**
- * Load notes from API
- * @returns {Promise<boolean>} True if successful, false otherwise
- */
-async function loadNotesFromAPI() {
-  try {
-    showLoading(MESSAGES.LOADING.NOTES, MESSAGES.WAIT);
-    const notes = await NotesAPI.getNotes();
-    const archivedNotes = await NotesAPI.getArchivedNotes();
-
-    notesStore.clear();
-    archivedStore.clear();
-
-    notes.forEach((n) => notesStore.set(n.id, { ...n, archived: false }));
-    archivedNotes.forEach((n) =>
-      archivedStore.set(n.id, { ...n, archived: true })
-    );
-
-    return true;
-  } catch (error) {
-    showError(MESSAGES.ERROR.LOAD_FAILED, error);
-    return false;
-  } finally {
-    hideLoading();
-  }
-}
+// Import utilities
+import { MESSAGES } from './constants.js';
+import { showError, showConfirm } from './ui-helpers.js';
 
 /**
- * Render notes to container
- * @param {HTMLElement} container - Container element
+ * Show list view (hide detail view)
  */
-function renderNotes(container) {
-  container.innerHTML = ''; // clear
-  let arr = Array.from(notesStore.values());
-
-  // Filter by search query
-  if (currentSearchQuery) {
-    const query = currentSearchQuery.toLowerCase();
-    arr = arr.filter(
-      (n) =>
-        n.title.toLowerCase().includes(query) ||
-        n.body.toLowerCase().includes(query)
-    );
-  }
-
-  // sort by createdAt desc
-  arr.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  arr.forEach((n) => {
-    const item = document.createElement('note-item');
-    item.data = n; // sets attributes
-    item.setAttribute('data-id', n.id);
-    item.setAttribute('tabindex', '0'); // Make focusable
-
-    container.appendChild(item);
-  });
-
-  // Update search result count
-  const searchBar = document.querySelector('search-bar');
-  if (searchBar && currentSearchQuery) {
-    searchBar.updateResult(arr.length, notesStore.size);
-  }
-
-  // Show message if no notes
-  if (arr.length === 0) {
-    if (currentSearchQuery) {
-      container.innerHTML = `<p class="empty-message">No notes found for "${currentSearchQuery}"</p>`;
-    } else {
-      container.innerHTML =
-        '<p class="empty-message">No notes yet. Create your first note!</p>';
-    }
-  }
-}
-
-function renderArchivedSection(container) {
-  container.innerHTML = '';
-  let arr = Array.from(archivedStore.values());
-
-  // Filter by search query
-  if (currentSearchQuery) {
-    const query = currentSearchQuery.toLowerCase();
-    arr = arr.filter(
-      (n) =>
-        n.title.toLowerCase().includes(query) ||
-        n.body.toLowerCase().includes(query)
-    );
-  }
-
-  arr.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  arr.forEach((n) => {
-    const item = document.createElement('note-item');
-    item.data = n;
-    item.setAttribute('data-id', n.id);
-    item.setAttribute('archived', 'true');
-    item.setAttribute('tabindex', '0'); // Make focusable
-    container.appendChild(item);
-  });
-
-  // Show message if no archived notes
-  if (arr.length === 0) {
-    if (currentSearchQuery) {
-      container.innerHTML = `<p class="empty-message">No archived notes found for "${currentSearchQuery}"</p>`;
-    } else {
-      container.innerHTML =
-        '<p class="empty-message">No archived notes. Archive notes to see them here.</p>';
-    }
-  }
-}
-
-// Update archived count (legacy)
-function updateArchivedCount() {
-  const cnt = archivedStore.size;
-  const span = document.getElementById('archivedCount');
-  if (span) span.textContent = String(cnt);
-}
-
-// Update stats display
-function updateStats() {
-  const statsEl = document.querySelector('note-stats');
-  if (statsEl) {
-    statsEl.activeCount = notesStore.size;
-    statsEl.archivedCount = archivedStore.size;
-    statsEl.totalCount = notesStore.size + archivedStore.size;
-  }
-  updateArchivedCount();
-}
-
-// Show list view
 function showListView() {
   const mainContainer = document.querySelector('main');
   const detailContainer = document.getElementById('noteDetailContainer');
-
-  if (mainContainer) {
-    mainContainer.style.display = 'block';
-  }
-
+  if (mainContainer) mainContainer.style.display = 'block';
   if (detailContainer) {
     detailContainer.style.display = 'none';
     detailContainer.innerHTML = '';
   }
 }
 
-// Show edit modal
+/**
+ * Show edit modal
+ * @param {Object} note - Note to edit
+ */
 function showEditModal(note) {
-  let editModal = document.querySelector('note-edit-modal');
-  
-  if (!editModal) {
-    editModal = document.createElement('note-edit-modal');
-    document.body.appendChild(editModal);
+  const modal = document.querySelector('note-edit-modal');
+  if (modal) {
+    modal.note = note;
+    modal.open();
   }
-
-  editModal.note = note;
-  editModal.open();
 }
 
-// Show detail view
+/**
+ * Show note detail view
+ * @param {Object} note - Note to display
+ */
 function showNoteDetail(note) {
+  const detailContainer = document.getElementById('noteDetailContainer');
   const mainContainer = document.querySelector('main');
-  if (!mainContainer) return;
 
-  // Hide list view
+  if (!detailContainer) return;
+
   mainContainer.style.display = 'none';
-
-  // Create or get detail view container
-  let detailContainer = document.getElementById('noteDetailContainer');
-  if (!detailContainer) {
-    detailContainer = document.createElement('div');
-    detailContainer.id = 'noteDetailContainer';
-    document.body.appendChild(detailContainer);
-  }
-
   detailContainer.style.display = 'block';
   detailContainer.innerHTML = '';
 
   const noteDetail = document.createElement('note-detail');
   noteDetail.note = note;
   detailContainer.appendChild(noteDetail);
-
-  // Listen to back button
-  noteDetail.addEventListener('back', () => {
-    showListView();
-  });
-
-  // Listen to edit button
-  noteDetail.addEventListener('edit', (e) => {
-    const { note: noteToEdit } = e.detail;
-    showEditModal(noteToEdit);
-  });
-
-  // Listen to archive button
-  noteDetail.addEventListener('archive', async (e) => {
-    const { noteId } = e.detail;
-    try {
-      showLoading('Archiving note...', 'Please wait');
-      await NotesAPI.archiveNote(noteId);
-      const noteData = notesStore.get(noteId);
-      notesStore.delete(noteId);
-      archivedStore.set(noteId, { ...noteData, archived: true });
-      showSuccess('Note archived!');
-      showListView();
-      const notesGrid = document.getElementById('notesGrid');
-      const archivedGrid = document.getElementById('archivedGrid');
-      renderNotes(notesGrid);
-      renderArchivedSection(archivedGrid);
-      updateStats();
-    } catch (error) {
-      showError('Failed to archive note', error);
-    } finally {
-      hideLoading();
-    }
-  });
-
-  // Listen to unarchive button
-  noteDetail.addEventListener('unarchive', async (e) => {
-    const { noteId } = e.detail;
-    try {
-      showLoading('Unarchiving note...', 'Please wait');
-      await NotesAPI.unarchiveNote(noteId);
-      const noteData = archivedStore.get(noteId);
-      archivedStore.delete(noteId);
-      notesStore.set(noteId, { ...noteData, archived: false });
-      showSuccess('Note unarchived!');
-      showListView();
-      const notesGrid = document.getElementById('notesGrid');
-      const archivedGrid = document.getElementById('archivedGrid');
-      renderNotes(notesGrid);
-      renderArchivedSection(archivedGrid);
-      updateStats();
-    } catch (error) {
-      showError('Failed to unarchive note', error);
-    } finally {
-      hideLoading();
-    }
-  });
-
-  // Listen to delete button
-  noteDetail.addEventListener('delete', async (e) => {
-    const { noteId } = e.detail;
-
-    // Confirm before deleting
-    const confirmed = await showConfirm(
-      'Are you sure?',
-      "You won't be able to revert this!",
-      'Yes, delete it!'
-    );
-
-    if (confirmed) {
-      // Store deleted note for undo
-      const deletedNote = notesStore.get(noteId) || archivedStore.get(noteId);
-      const wasArchived = deletedNote?.archived || false;
-
-      try {
-        showLoading('Deleting note...', 'Please wait');
-        await NotesAPI.deleteNote(noteId);
-        notesStore.delete(noteId);
-        archivedStore.delete(noteId);
-        hideLoading();
-
-        // Show success with undo option
-        showSuccessWithUndo('Note deleted!', async () => {
-          try {
-            showLoading('Restoring note...', 'Please wait');
-            const restored = await NotesAPI.createNote(
-              deletedNote.title,
-              deletedNote.body
-            );
-            if (wasArchived) {
-              await NotesAPI.archiveNote(restored.id);
-              archivedStore.set(restored.id, { ...restored, archived: true });
-            } else {
-              notesStore.set(restored.id, { ...restored, archived: false });
-            }
-            showSuccess('Note restored!');
-            const notesGrid = document.getElementById('notesGrid');
-            const archivedGrid = document.getElementById('archivedGrid');
-            renderNotes(notesGrid);
-            renderArchivedSection(archivedGrid);
-            updateStats();
-          } catch (error) {
-            showError('Failed to restore note', error);
-          } finally {
-            hideLoading();
-          }
-        });
-
-        showListView();
-        const notesGrid = document.getElementById('notesGrid');
-        const archivedGrid = document.getElementById('archivedGrid');
-        renderNotes(notesGrid);
-        renderArchivedSection(archivedGrid);
-        updateStats();
-      } catch (error) {
-        showError('Failed to delete note', error);
-        hideLoading();
-      }
-    }
-  });
-
-  // Scroll to top
-  window.scrollTo(0, 0);
 }
 
-function setFilter(filter) {
-  currentFilter = filter === 'archived' ? 'archived' : 'all';
+/**
+ * Refresh all views
+ */
+function refreshViews() {
   const notesGrid = document.getElementById('notesGrid');
   const archivedGrid = document.getElementById('archivedGrid');
-  renderNotes(notesGrid);
-  renderArchivedSection(archivedGrid);
-  updateStats();
-  // update active class on buttons and aria-pressed
+
+  renderNotes(notesGrid, getActiveNotes());
+  renderArchivedSection(archivedGrid, getArchivedNotes());
+  
+  const stats = getStats();
+  updateArchivedCount(stats.archivedCount);
+  updateStats(stats);
+}
+
+/**
+ * Set active filter
+ * @param {string} filter - Filter to activate
+ */
+function setFilter(filter) {
+  setCurrentFilter(filter);
+  const notesGrid = document.getElementById('notesGrid');
+  renderNotes(notesGrid, getActiveNotes());
+
+  // Update filter buttons
   document.querySelectorAll('.filter-btn').forEach((b) => {
-    const isActive = b.dataset.filter === currentFilter;
+    const isActive = b.dataset.filter === filter;
     b.classList.toggle('active', isActive);
     b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
   });
 }
 
+/**
+ * Mount application and setup event listeners
+ */
 async function mount() {
-  // Load notes from API
+  // Load data
   await loadNotesFromAPI();
 
-  const notesGrid = document.getElementById('notesGrid');
-  const archivedGrid = document.getElementById('archivedGrid');
+  // Get DOM elements
+  const noteInput = document.querySelector('note-input');
+  const noteDetail = document.querySelector('note-detail');
+  const editModal = document.querySelector('note-edit-modal');
   const restoreAllBtn = document.getElementById('restoreAllBtn');
   const deleteAllArchivedBtn = document.getElementById('deleteAllArchivedBtn');
 
-  renderNotes(notesGrid);
-  renderArchivedSection(archivedGrid);
-  updateStats();
+  // Initial render
+  refreshViews();
 
-  // Listen to note click (view detail)
-  document.body.addEventListener('note-click', (e) => {
-    const { note } = e.detail;
-    showNoteDetail(note);
-  });
+  // === EVENT LISTENERS ===
 
-  // Listen to search
+  // Search functionality
   document.body.addEventListener('search', (e) => {
-    currentSearchQuery = e.detail.query;
-    renderNotes(notesGrid);
-    renderArchivedSection(archivedGrid);
+    setSearchQuery(e.detail.query);
+    refreshViews();
   });
 
-  // Listen to add
-  document.body.addEventListener('note-added', async (e) => {
-    const note = e.detail;
-    try {
-      showLoading('Creating note...', 'Saving to server');
-      const createdNote = await NotesAPI.createNote({
-        title: note.title,
-        body: note.body,
+  // Note creation
+  if (noteInput) {
+    noteInput.addEventListener('note-add', async (e) => {
+      await handleCreateNote(e.detail, refreshViews);
+    });
+  }
+
+  // Note editing
+  if (editModal) {
+    editModal.addEventListener('save', async (e) => {
+      await handleUpdateNote(e.detail.id, e.detail, () => {
+        refreshViews();
+        const updatedNote = getNoteById(e.detail.id);
+        if (updatedNote) showNoteDetail(updatedNote);
       });
-      notesStore.set(createdNote.id, { ...createdNote, archived: false });
-      renderNotes(notesGrid);
-      showSuccess('Note created successfully!');
-    } catch (error) {
-      showError('Failed to create note', error);
-    } finally {
-      hideLoading();
-    }
+    });
+  }
+
+  // Note detail view events
+  if (noteDetail) {
+    noteDetail.addEventListener('back', showListView);
+
+    noteDetail.addEventListener('edit', (e) => {
+      const note = getNoteById(e.detail.noteId);
+      if (note) showEditModal(note);
+    });
+
+    noteDetail.addEventListener('archive', async (e) => {
+      await handleArchiveNote(e.detail.noteId, () => {
+        showListView();
+        refreshViews();
+      });
+    });
+
+    noteDetail.addEventListener('unarchive', async (e) => {
+      await handleUnarchiveNote(e.detail.noteId, () => {
+        showListView();
+        refreshViews();
+      });
+    });
+
+    noteDetail.addEventListener('delete', async (e) => {
+      const confirmed = await showConfirm(
+        'Are you sure?',
+        "You won't be able to revert this!",
+        'Yes, delete it!'
+      );
+
+      if (confirmed) {
+        await handleDeleteNote(e.detail.noteId, () => {
+          showListView();
+          refreshViews();
+        });
+      }
+    });
+  }
+
+  // Note item click (show detail)
+  document.body.addEventListener('note-click', (e) => {
+    const note = getNoteById(e.detail.id);
+    if (note) showNoteDetail(note);
   });
 
-  // Listen to edit (update note)
-  document.body.addEventListener('note-updated', async (e) => {
-    const { id, title, body, archived } = e.detail;
-    try {
-      showLoading('Updating note...', 'Saving changes');
-      
-      // API Dicoding doesn't have UPDATE endpoint, so we delete and recreate
-      await NotesAPI.deleteNote(id);
-      const newNote = await NotesAPI.createNote({ title, body });
-      
-      // If it was archived, archive the new note
-      if (archived) {
-        await NotesAPI.archiveNote(newNote.id);
-        archivedStore.delete(id);
-        archivedStore.set(newNote.id, { ...newNote, archived: true });
-      } else {
-        notesStore.delete(id);
-        notesStore.set(newNote.id, { ...newNote, archived: false });
-      }
-      
-      renderNotes(notesGrid);
-      renderArchivedSection(archivedGrid);
-      showSuccess('Note updated successfully!');
-      
-      // Refresh detail view if open
-      const detailContainer = document.getElementById('noteDetailContainer');
-      if (detailContainer && detailContainer.style.display !== 'none') {
-        const updatedNote = archived 
-          ? archivedStore.get(newNote.id) 
-          : notesStore.get(newNote.id);
-        showNoteDetail(updatedNote);
-      }
-    } catch (error) {
-      showError('Failed to update note', error);
-    } finally {
-      hideLoading();
-    }
+  // Note item edit
+  document.body.addEventListener('note-edit', (e) => {
+    const note = getNoteById(e.detail.id);
+    if (note) showEditModal(note);
   });
 
-  // listen to archive / delete from note-item bubbles
+  // Note item archive/unarchive
   document.body.addEventListener('note-archive', async (e) => {
-    const { id } = e.detail;
-    const isInNotes = notesStore.has(id);
-    const isInArchived = archivedStore.has(id);
-
-    try {
-      showLoading('Processing...', 'Please wait');
-
-      if (isInNotes) {
-        // Archive the note
-        await NotesAPI.archiveNote(id);
-        const note = notesStore.get(id);
-        notesStore.delete(id);
-        archivedStore.set(id, { ...note, archived: true });
-        showSuccess('Note archived!');
-      } else if (isInArchived) {
-        // Unarchive the note
-        await NotesAPI.unarchiveNote(id);
-        const note = archivedStore.get(id);
-        archivedStore.delete(id);
-        notesStore.set(id, { ...note, archived: false });
-        showSuccess('Note unarchived!');
-      }
-
-      renderNotes(notesGrid);
-      renderArchivedSection(archivedGrid);
-      updateStats();
-    } catch (error) {
-      showError('Failed to process note', error);
-    } finally {
-      hideLoading();
-    }
+    await handleArchiveNote(e.detail.id, refreshViews);
   });
 
-  document.body.addEventListener('note-delete', async (e) => {
-    const { id } = e.detail;
+  document.body.addEventListener('note-unarchive', async (e) => {
+    await handleUnarchiveNote(e.detail.id, refreshViews);
+  });
 
-    // Confirm before deleting
+  // Note item delete
+  document.body.addEventListener('note-delete', async (e) => {
     const confirmed = await showConfirm(
       'Are you sure?',
       "You won't be able to revert this!",
@@ -494,124 +241,27 @@ async function mount() {
     );
 
     if (confirmed) {
-      try {
-        showLoading('Deleting note...', 'Please wait');
-        await NotesAPI.deleteNote(id);
-        notesStore.delete(id);
-        archivedStore.delete(id);
-        renderNotes(notesGrid);
-        renderArchivedSection(archivedGrid);
-        updateStats();
-        showSuccess('Note deleted!');
-      } catch (error) {
-        showError('Failed to delete note', error);
-      } finally {
-        hideLoading();
-      }
+      await handleDeleteNote(e.detail.id, refreshViews);
     }
   });
 
-  // bulk actions for archived section
+  // Bulk actions
   if (restoreAllBtn) {
     restoreAllBtn.addEventListener('click', async () => {
-      const archivedIds = Array.from(archivedStore.keys());
-      if (archivedIds.length === 0) {
-        showError(MESSAGES.ERROR.NO_ARCHIVED_NOTES);
-        return;
-      }
-
-      try {
-        showLoading(
-          'Restoring all notes...',
-          `Processing ${archivedIds.length} notes`
-        );
-        // Unarchive all notes - Use Promise.all for parallel execution
-        await Promise.all(
-          archivedIds.map(async (id) => {
-            await NotesAPI.unarchiveNote(id);
-            const note = archivedStore.get(id);
-            archivedStore.delete(id);
-            notesStore.set(id, { ...note, archived: false });
-          })
-        );
-        renderNotes(notesGrid);
-        renderArchivedSection(archivedGrid);
-        updateStats();
-        showSuccess('All notes restored!');
-      } catch (error) {
-        showError('Failed to restore all notes', error);
-      } finally {
-        hideLoading();
-      }
+      await handleRestoreAll(refreshViews);
     });
   }
 
   if (deleteAllArchivedBtn) {
     deleteAllArchivedBtn.addEventListener('click', async () => {
-      const archivedIds = Array.from(archivedStore.keys());
-      if (archivedIds.length === 0) {
-        showError(MESSAGES.ERROR.NO_ARCHIVED_NOTES);
-        return;
-      }
-
-      const confirmed = await showConfirm(
-        'Delete all archived notes?',
-        `This will permanently delete ${archivedIds.length} archived notes!`,
-        'Yes, delete all!'
-      );
-
-      if (confirmed) {
-        try {
-          showLoading(
-            'Deleting all archived notes...',
-            `Processing ${archivedIds.length} notes`
-          );
-          // Delete all archived notes - Use Promise.all for parallel execution
-          await Promise.all(
-            archivedIds.map(async (id) => {
-              await NotesAPI.deleteNote(id);
-              archivedStore.delete(id);
-            })
-          );
-          renderNotes(notesGrid);
-          renderArchivedSection(archivedGrid);
-          updateStats();
-          showSuccess('All archived notes deleted!');
-        } catch (error) {
-          showError('Failed to delete all archived notes', error);
-        } finally {
-          hideLoading();
-        }
-      }
+      await handleDeleteAll(refreshViews);
     });
   }
 
-  // export / import handlers (app-bar) - Not using API, just for local backup
-  document.body.addEventListener('export-notes', async () => {
-    try {
-      showLoading('Exporting notes...', 'Preparing download');
-      const allNotes = [
-        ...Array.from(notesStore.values()),
-        ...Array.from(archivedStore.values()),
-      ];
-      const data = JSON.stringify(allNotes, null, 2);
-      const blob = new Blob([data], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `notes-export-${new Date().getTime()}.json`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-      hideLoading();
-      showSuccess('Notes exported successfully!');
-    } catch (err) {
-      hideLoading();
-      showError('Export failed', err);
-    }
-  });
+  // Export notes
+  document.body.addEventListener('export-notes', handleExportNotes);
 
+  // Import notes (not available in API mode)
   document.body.addEventListener('import-notes', () => {
     showError(MESSAGES.ERROR.IMPORT_NOT_AVAILABLE);
   });
@@ -620,7 +270,7 @@ async function mount() {
     showError('Import error', new Error(e.detail && e.detail.error));
   });
 
-  // filter buttons
+  // Filter buttons
   document.body.addEventListener('click', (e) => {
     const btn = e.target.closest && e.target.closest('.filter-btn');
     if (btn) {
@@ -628,52 +278,26 @@ async function mount() {
     }
   });
 
-  // initialize filter buttons state
+  // Initialize filter buttons state
   document.querySelectorAll('.filter-btn').forEach((b) => {
-    const isActive = b.dataset.filter === currentFilter;
+    const isActive = b.dataset.filter === getCurrentFilter();
     b.classList.toggle('active', isActive);
     b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
   });
 
-  // Warn before leaving if note input has unsaved changes
+  // Warn before leaving with unsaved changes
   window.addEventListener('beforeunload', (e) => {
-    const noteInput = document.querySelector('note-input');
-    if (noteInput) {
-      const titleInput = noteInput.shadowRoot.querySelector('#noteTitle');
-      const bodyInput = noteInput.shadowRoot.querySelector('#noteBody');
-      const hasContent =
-        (titleInput && titleInput.value.trim()) ||
-        (bodyInput && bodyInput.value.trim());
-
-      if (hasContent) {
-        e.preventDefault();
-        // eslint-disable-next-line no-param-reassign
-        e.returnValue = '';
-      }
+    const input = document.querySelector('note-input');
+    if (input && input.hasUnsavedChanges && input.hasUnsavedChanges()) {
+      e.preventDefault();
+      e.returnValue = '';
     }
   });
 }
 
-// mount on DOMContentLoaded
+// Initialize app when DOM is ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', mount);
-} else mount();
-
-// Register Service Worker for PWA
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker
-      .register('/service-worker.js')
-      .then((registration) => {
-        // eslint-disable-next-line no-console
-        console.log('ServiceWorker registered:', registration);
-      })
-      .catch((error) => {
-        // eslint-disable-next-line no-console
-        console.error('ServiceWorker registration failed:', error);
-      });
-  });
+} else {
+  mount();
 }
-
-export { notesStore, archivedStore };
-
