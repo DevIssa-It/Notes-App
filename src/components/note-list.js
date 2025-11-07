@@ -7,11 +7,6 @@ template.innerHTML = `
       gap: 20px;
       align-items: start;
     }
-    ::slotted(note-item) {
-      display: flex;
-      width: 100%;
-      min-width: 0;
-    }
   </style>
   <slot></slot>
 `;

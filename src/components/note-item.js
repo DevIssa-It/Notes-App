@@ -2,6 +2,8 @@ const template = document.createElement('template');
 template.innerHTML = `
   <style>
     :host {
+      display: block;
+      width: 100%;
       transition: all 300ms ease;
     }
     
