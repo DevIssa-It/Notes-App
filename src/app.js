@@ -154,7 +154,7 @@ async function mount() {
   });
 
   // Note creation
-  document.body.addEventListener('note-add', async (e) => {
+  document.body.addEventListener('note-added', async (e) => {
     await handleCreateNote(e.detail, refreshViews);
   });
 
