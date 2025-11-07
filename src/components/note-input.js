@@ -2,33 +2,10 @@ const template = document.createElement('template');
 template.innerHTML = `
   <style>
     :host {
-      --form-bg: linear-gradient(145deg, rgba(30,41,59,0.6), rgba(15,23,42,0.8));
-      --form-border: #334155;
-      --input-bg: rgba(15,23,42,0.8);
-      --input-bg-focus: rgba(15,23,42,0.95);
-      --input-border: #334155;
-      --input-text: #e6eef8;
-      --label-text: #94a3b8;
-      --btn-bg: rgba(30,41,59,0.9);
-      --btn-border: #334155;
-      --btn-text: #e6eef8;
-      --shadow: rgba(0,0,0,0.4);
       transition: all 300ms ease;
     }
 
-    :host-context([data-theme='light']) {
-      --form-bg: linear-gradient(145deg, #ffffff, #f8fafc);
-      --form-border: #cbd5e1;
-      --input-bg: #f8fafc;
-      --input-bg-focus: #ffffff;
-      --input-border: #cbd5e1;
-      --input-text: #0f172a;
-      --label-text: #475569;
-      --btn-bg: #ffffff;
-      --btn-border: #cbd5e1;
-      --btn-text: #0f172a;
-      --shadow: rgba(15,23,42,0.1);
-    }
+    /* Use CSS variables from parent document */
 
     * {
       box-sizing: border-box;
@@ -38,39 +15,40 @@ template.innerHTML = `
       gap:16px;
       padding:24px;
       border-radius:18px;
-      background:var(--form-bg);
-      border:2px solid var(--form-border);
-      box-shadow:0 6px 16px var(--shadow), 0 2px 6px var(--shadow);
+      background: var(--card-gradient);
+      border:2px solid var(--card-border);
+      box-shadow: var(--shadow-md);
       width:100%;
       max-width:100%;
     }
     input[type="text"], textarea{
       width:100%;
       max-width:100%;
-      background:var(--input-bg);
+      background: var(--input-bg);
       border:2px solid var(--input-border);
-      color:var(--input-text);
+      color: var(--text-primary);
       padding:14px 16px;
       border-radius:14px;
       resize:vertical;
       font-family:inherit;
       font-size:0.95rem;
       transition:all 250ms cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow:inset 0 2px 4px var(--shadow);
+      box-shadow: var(--shadow-sm);
       box-sizing:border-box;
     }
     input[type="text"]:focus, textarea:focus{
       outline:none;
-      border-color:#7c3aed;
-      background:var(--input-bg-focus);
-      box-shadow:0 0 0 4px rgba(124,58,237,0.2), inset 0 2px 4px var(--shadow);
+      border-color: var(--input-border-focus);
+      background: var(--input-bg-focus);
+      box-shadow:0 0 0 4px rgba(124,58,237,0.2), var(--shadow-sm);
       transform:translateY(-1px);
     }
     input[type="text"]:hover, textarea:hover{
       border-color:rgba(124,58,237,0.4);
     }
     input[type="text"]::placeholder, textarea::placeholder{
-      color:rgba(148,163,184,0.5);
+      color: var(--text-secondary);
+      opacity: 0.6;
     }
     textarea{
       min-height:110px;
@@ -78,7 +56,7 @@ template.innerHTML = `
     }
     label{
       font-size:0.85rem;
-      color:var(--label-text);
+      color: var(--text-secondary);
       font-weight:500;
       display:block;
     }
@@ -98,22 +76,22 @@ template.innerHTML = `
     }
     .form-help{
       font-size:0.82rem;
-      color:var(--label-text);
+      color: var(--text-secondary);
       font-style:italic;
       flex:1;
       min-width:150px;
     }
     .btn{
-      background:var(--btn-bg);
-      border:2px solid var(--btn-border);
-      color:var(--btn-text);
+      background: var(--input-bg);
+      border:2px solid var(--card-border);
+      color: var(--text-primary);
       padding:9px 16px;
       border-radius:12px;
       cursor:pointer;
       font-size:0.88rem;
       font-weight:600;
       transition:all 220ms cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow:0 2px 6px var(--shadow);
+      box-shadow: var(--shadow-sm);
       position:relative;
       overflow:hidden;
       white-space:nowrap;
@@ -132,14 +110,14 @@ template.innerHTML = `
       left:100%;
     }
     .btn:hover{
-      background:var(--input-bg-focus);
+      background: var(--input-bg-focus);
       border-color:rgba(124,58,237,0.7);
       transform:translateY(-2px);
-      box-shadow:0 6px 16px rgba(124,58,237,0.3), 0 2px 6px var(--shadow);
+      box-shadow:0 6px 16px rgba(124,58,237,0.3), var(--shadow-sm);
     }
     .btn:active{
       transform:translateY(0);
-      box-shadow:0 2px 6px var(--shadow);
+      box-shadow: var(--shadow-sm);
     }
     .btn.primary{
       background:linear-gradient(135deg,#7c3aed,#06b6d4);

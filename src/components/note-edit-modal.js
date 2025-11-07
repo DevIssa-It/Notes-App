@@ -35,24 +35,9 @@ class NoteEditModal extends HTMLElement {
           right: 0;
           bottom: 0;
           z-index: 9999;
-          --modal-bg: linear-gradient(145deg, #1e293b, #0f172a);
-          --modal-border: #334155;
-          --input-bg: rgba(15, 23, 42, 0.8);
-          --input-border: #334155;
-          --text-primary: #e6eef8;
-          --text-muted: #94a3b8;
-          --shadow: rgba(0, 0, 0, 0.5);
         }
 
-        :host-context([data-theme='light']) {
-          --modal-bg: linear-gradient(145deg, #ffffff, #f8fafc);
-          --modal-border: #cbd5e1;
-          --input-bg: #f8fafc;
-          --input-border: #cbd5e1;
-          --text-primary: #0f172a;
-          --text-muted: #64748b;
-          --shadow: rgba(0, 0, 0, 0.15);
-        }
+        /* Use CSS variables from parent document */
 
         :host([open]) {
           display: flex;
@@ -69,10 +54,6 @@ class NoteEditModal extends HTMLElement {
           background: rgba(0, 0, 0, 0.7);
           backdrop-filter: blur(4px);
           animation: fadeIn 0.3s ease;
-        }
-
-        :host-context([data-theme='light']) .backdrop {
-          background: rgba(0, 0, 0, 0.4);
         }
 
         @keyframes fadeIn {
@@ -93,15 +74,15 @@ class NoteEditModal extends HTMLElement {
 
         .modal {
           position: relative;
-          background: var(--modal-bg);
+          background: var(--card-gradient);
           border-radius: 16px;
           padding: 2rem;
           width: 90%;
           max-width: 600px;
           max-height: 90vh;
           overflow-y: auto;
-          box-shadow: 0 20px 60px var(--shadow);
-          border: 2px solid var(--modal-border);
+          box-shadow: var(--shadow-lg);
+          border: 2px solid var(--card-border);
           animation: slideUp 0.3s ease;
         }
 
@@ -111,7 +92,7 @@ class NoteEditModal extends HTMLElement {
           justify-content: space-between;
           margin-bottom: 1.5rem;
           padding-bottom: 1rem;
-          border-bottom: 2px solid var(--modal-border);
+          border-bottom: 2px solid var(--card-border);
         }
 
         .modal-title {
@@ -129,7 +110,7 @@ class NoteEditModal extends HTMLElement {
         .close-button {
           background: transparent;
           border: none;
-          color: var(--text-muted);
+          color: var(--text-secondary);
           font-size: 1.5rem;
           cursor: pointer;
           padding: 0.5rem;
@@ -175,8 +156,8 @@ class NoteEditModal extends HTMLElement {
         input:focus,
         textarea:focus {
           outline: none;
-          border-color: #7c3aed;
-          background: var(--input-bg);
+          border-color: var(--input-border-focus);
+          background: var(--input-bg-focus);
           box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
         }
 
@@ -189,7 +170,7 @@ class NoteEditModal extends HTMLElement {
         .char-count {
           text-align: right;
           font-size: 0.85rem;
-          color: var(--text-muted);
+          color: var(--text-secondary);
           margin-top: 0.25rem;
         }
 

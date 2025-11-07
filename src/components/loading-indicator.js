@@ -13,33 +13,22 @@ template.innerHTML = `
       justify-content: center;
       align-items: center;
       backdrop-filter: blur(4px);
-      --loader-bg: linear-gradient(145deg, #1e293b, rgba(30, 41, 59, 0.95));
-      --loader-border: #334155;
-      --text-primary: #e6eef8;
-      --text-secondary: #94a3b8;
-      --shadow: rgba(0, 0, 0, 0.5);
       transition: all 300ms ease;
     }
 
-    :host-context([data-theme='light']) {
-      background: rgba(0, 0, 0, 0.3);
-      --loader-bg: linear-gradient(145deg, #ffffff, #f8fafc);
-      --loader-border: #cbd5e1;
-      --text-primary: #0f172a;
-      --text-secondary: #64748b;
-      --shadow: rgba(0, 0, 0, 0.15);
-    }
+    /* Use CSS variables from parent document */
+    /* Use CSS variables from parent document */
 
     :host([active]) {
       display: flex;
     }
 
     .loader-container {
-      background: var(--loader-bg);
+      background: var(--card-gradient);
       padding: 40px 50px;
       border-radius: 20px;
-      border: 2px solid var(--loader-border);
-      box-shadow: 0 12px 40px var(--shadow);
+      border: 2px solid var(--card-border);
+      box-shadow: var(--shadow-lg);
       text-align: center;
       animation: fadeIn 0.3s ease;
     }
