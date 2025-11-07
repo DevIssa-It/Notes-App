@@ -13,94 +13,48 @@ import './components/note-detail.js';
 import './components/note-edit-modal.js';
 import './components/theme-toggle.js';
 import './components/note-stats.js';
-import Swal from 'sweetalert2';
-import NotesAPI from './api.js';
 
+// Import utilities
+import NotesAPI from './api.js';
+import { MESSAGES, FILTERS } from './constants.js';
+import {
+  showError,
+  showSuccess,
+  showSuccessWithUndo,
+  showConfirm,
+  LoadingManager,
+} from './ui-helpers.js';
+
+// Application State
 const notesStore = new Map();
 const archivedStore = new Map();
-let currentFilter = 'all'; // 'all' or 'archived'
-let currentSearchQuery = ''; // current search query
-let loadingIndicator = null;
+let currentFilter = FILTERS.ALL;
+let currentSearchQuery = '';
+const loadingManager = new LoadingManager();
 
-// Helper function to show loading
-function showLoading(message = 'Loading...', submessage = 'Please wait') {
-  if (!loadingIndicator) {
-    loadingIndicator = document.querySelector('loading-indicator');
-  }
-  if (loadingIndicator) {
-    loadingIndicator.show(message, submessage);
-  }
+/**
+ * Show loading indicator
+ * @param {string} message - Loading message
+ * @param {string} submessage - Loading submessage
+ */
+function showLoading(message = MESSAGES.LOADING.DEFAULT, submessage = MESSAGES.WAIT) {
+  loadingManager.show(message, submessage);
 }
 
-// Helper function to hide loading
+/**
+ * Hide loading indicator
+ */
 function hideLoading() {
-  if (loadingIndicator) {
-    loadingIndicator.hide();
-  }
+  loadingManager.hide();
 }
 
-// Helper to get current theme colors for SweetAlert
-function getSwalTheme() {
-  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-  return {
-    background: isLight ? '#ffffff' : '#1e293b',
-    color: isLight ? '#0f172a' : '#e6eef8',
-  };
-}
-
-// Helper function to show error
-function showError(message, error) {
-  console.error(message, error);
-  const theme = getSwalTheme();
-  Swal.fire({
-    icon: 'error',
-    title: 'Oops...',
-    text: message,
-    footer: error ? `<small>${error.message}</small>` : '',
-    confirmButtonColor: '#7c3aed',
-    background: theme.background,
-    color: theme.color,
-  });
-}
-
-// Helper function to show success
-function showSuccess(message) {
-  const theme = getSwalTheme();
-  Swal.fire({
-    icon: 'success',
-    title: 'Success!',
-    text: message,
-    timer: 2000,
-    showConfirmButton: false,
-    background: theme.background,
-    color: theme.color,
-  });
-}
-
-// Helper function to show success with undo action
-function showSuccessWithUndo(message, undoCallback) {
-  const theme = getSwalTheme();
-  Swal.fire({
-    icon: 'success',
-    title: 'Success!',
-    text: message,
-    timer: 5000,
-    showConfirmButton: true,
-    confirmButtonText: '<i class="fas fa-undo"></i> Undo',
-    confirmButtonColor: '#7c3aed',
-    background: theme.background,
-    color: theme.color,
-  }).then((result) => {
-    if (result.isConfirmed && undoCallback) {
-      undoCallback();
-    }
-  });
-}
-
-// Load notes from API
+/**
+ * Load notes from API
+ * @returns {Promise<boolean>} True if successful, false otherwise
+ */
 async function loadNotesFromAPI() {
   try {
-    showLoading('Loading notes...', 'Fetching from server');
+    showLoading(MESSAGES.LOADING.NOTES, MESSAGES.WAIT);
     const notes = await NotesAPI.getNotes();
     const archivedNotes = await NotesAPI.getArchivedNotes();
 
@@ -114,13 +68,17 @@ async function loadNotesFromAPI() {
 
     return true;
   } catch (error) {
-    showError('Failed to load notes from server', error);
+    showError(MESSAGES.ERROR.LOAD_FAILED, error);
     return false;
   } finally {
     hideLoading();
   }
 }
 
+/**
+ * Render notes to container
+ * @param {HTMLElement} container - Container element
+ */
 function renderNotes(container) {
   container.innerHTML = ''; // clear
   let arr = Array.from(notesStore.values());
@@ -329,20 +287,13 @@ function showNoteDetail(note) {
     const { noteId } = e.detail;
 
     // Confirm before deleting
-    const theme = getSwalTheme();
-    const result = await Swal.fire({
-      title: 'Are you sure?',
-      text: "You won't be able to revert this!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#dc2626',
-      cancelButtonColor: '#64748b',
-      confirmButtonText: 'Yes, delete it!',
-      background: theme.background,
-      color: theme.color,
-    });
+    const confirmed = await showConfirm(
+      'Are you sure?',
+      "You won't be able to revert this!",
+      'Yes, delete it!'
+    );
 
-    if (result.isConfirmed) {
+    if (confirmed) {
       // Store deleted note for undo
       const deletedNote = notesStore.get(noteId) || archivedStore.get(noteId);
       const wasArchived = deletedNote?.archived || false;
@@ -536,20 +487,13 @@ async function mount() {
     const { id } = e.detail;
 
     // Confirm before deleting
-    const theme = getSwalTheme();
-    const result = await Swal.fire({
-      title: 'Are you sure?',
-      text: "You won't be able to revert this!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#dc2626',
-      cancelButtonColor: '#64748b',
-      confirmButtonText: 'Yes, delete it!',
-      background: theme.background,
-      color: theme.color,
-    });
+    const confirmed = await showConfirm(
+      'Are you sure?',
+      "You won't be able to revert this!",
+      'Yes, delete it!'
+    );
 
-    if (result.isConfirmed) {
+    if (confirmed) {
       try {
         showLoading('Deleting note...', 'Please wait');
         await NotesAPI.deleteNote(id);
@@ -572,14 +516,7 @@ async function mount() {
     restoreAllBtn.addEventListener('click', async () => {
       const archivedIds = Array.from(archivedStore.keys());
       if (archivedIds.length === 0) {
-        const theme = getSwalTheme();
-        Swal.fire({
-          icon: 'info',
-          title: 'No archived notes',
-          text: 'There are no archived notes to restore',
-          background: theme.background,
-          color: theme.color,
-        });
+        showError(MESSAGES.ERROR.NO_ARCHIVED_NOTES);
         return;
       }
 
@@ -613,31 +550,17 @@ async function mount() {
     deleteAllArchivedBtn.addEventListener('click', async () => {
       const archivedIds = Array.from(archivedStore.keys());
       if (archivedIds.length === 0) {
-        const theme = getSwalTheme();
-        Swal.fire({
-          icon: 'info',
-          title: 'No archived notes',
-          text: 'There are no archived notes to delete',
-          background: theme.background,
-          color: theme.color,
-        });
+        showError(MESSAGES.ERROR.NO_ARCHIVED_NOTES);
         return;
       }
 
-      const theme = getSwalTheme();
-      const result = await Swal.fire({
-        title: 'Delete all archived notes?',
-        text: `This will permanently delete ${archivedIds.length} archived notes!`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#dc2626',
-        cancelButtonColor: '#64748b',
-        confirmButtonText: 'Yes, delete all!',
-        background: theme.background,
-        color: theme.color,
-      });
+      const confirmed = await showConfirm(
+        'Delete all archived notes?',
+        `This will permanently delete ${archivedIds.length} archived notes!`,
+        'Yes, delete all!'
+      );
 
-      if (result.isConfirmed) {
+      if (confirmed) {
         try {
           showLoading(
             'Deleting all archived notes...',
@@ -690,14 +613,7 @@ async function mount() {
   });
 
   document.body.addEventListener('import-notes', () => {
-    const theme = getSwalTheme();
-    Swal.fire({
-      icon: 'info',
-      title: 'Import Not Available',
-      text: 'Import feature is disabled when using API mode. Please use the API to manage your notes.',
-      background: theme.background,
-      color: theme.color,
-    });
+    showError(MESSAGES.ERROR.IMPORT_NOT_AVAILABLE);
   });
 
   document.body.addEventListener('import-error', (e) => {
