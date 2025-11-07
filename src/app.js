@@ -12,6 +12,7 @@ import './components/search-bar.js';
 import './components/note-detail.js';
 import './components/note-edit-modal.js';
 import './components/theme-toggle.js';
+import './components/note-stats.js';
 import Swal from 'sweetalert2';
 import NotesAPI from './api.js';
 
@@ -73,6 +74,26 @@ function showSuccess(message) {
     showConfirmButton: false,
     background: theme.background,
     color: theme.color,
+  });
+}
+
+// Helper function to show success with undo action
+function showSuccessWithUndo(message, undoCallback) {
+  const theme = getSwalTheme();
+  Swal.fire({
+    icon: 'success',
+    title: 'Success!',
+    text: message,
+    timer: 5000,
+    showConfirmButton: true,
+    confirmButtonText: '<i class="fas fa-undo"></i> Undo',
+    confirmButtonColor: '#7c3aed',
+    background: theme.background,
+    color: theme.color,
+  }).then((result) => {
+    if (result.isConfirmed && undoCallback) {
+      undoCallback();
+    }
   });
 }
 
@@ -177,10 +198,22 @@ function renderArchivedSection(container) {
   }
 }
 
+// Update archived count (legacy)
 function updateArchivedCount() {
   const cnt = archivedStore.size;
   const span = document.getElementById('archivedCount');
   if (span) span.textContent = String(cnt);
+}
+
+// Update stats display
+function updateStats() {
+  const statsEl = document.querySelector('note-stats');
+  if (statsEl) {
+    statsEl.activeCount = notesStore.size;
+    statsEl.archivedCount = archivedStore.size;
+    statsEl.totalCount = notesStore.size + archivedStore.size;
+  }
+  updateArchivedCount();
 }
 
 // Show list view
@@ -260,7 +293,7 @@ function showNoteDetail(note) {
       const archivedGrid = document.getElementById('archivedGrid');
       renderNotes(notesGrid);
       renderArchivedSection(archivedGrid);
-      updateArchivedCount();
+      updateStats();
     } catch (error) {
       showError('Failed to archive note', error);
     } finally {
@@ -283,7 +316,7 @@ function showNoteDetail(note) {
       const archivedGrid = document.getElementById('archivedGrid');
       renderNotes(notesGrid);
       renderArchivedSection(archivedGrid);
-      updateArchivedCount();
+      updateStats();
     } catch (error) {
       showError('Failed to unarchive note', error);
     } finally {
@@ -310,21 +343,52 @@ function showNoteDetail(note) {
     });
 
     if (result.isConfirmed) {
+      // Store deleted note for undo
+      const deletedNote = notesStore.get(noteId) || archivedStore.get(noteId);
+      const wasArchived = deletedNote?.archived || false;
+
       try {
         showLoading('Deleting note...', 'Please wait');
         await NotesAPI.deleteNote(noteId);
         notesStore.delete(noteId);
         archivedStore.delete(noteId);
-        showSuccess('Note deleted!');
+        hideLoading();
+
+        // Show success with undo option
+        showSuccessWithUndo('Note deleted!', async () => {
+          try {
+            showLoading('Restoring note...', 'Please wait');
+            const restored = await NotesAPI.createNote(
+              deletedNote.title,
+              deletedNote.body
+            );
+            if (wasArchived) {
+              await NotesAPI.archiveNote(restored.id);
+              archivedStore.set(restored.id, { ...restored, archived: true });
+            } else {
+              notesStore.set(restored.id, { ...restored, archived: false });
+            }
+            showSuccess('Note restored!');
+            const notesGrid = document.getElementById('notesGrid');
+            const archivedGrid = document.getElementById('archivedGrid');
+            renderNotes(notesGrid);
+            renderArchivedSection(archivedGrid);
+            updateStats();
+          } catch (error) {
+            showError('Failed to restore note', error);
+          } finally {
+            hideLoading();
+          }
+        });
+
         showListView();
         const notesGrid = document.getElementById('notesGrid');
         const archivedGrid = document.getElementById('archivedGrid');
         renderNotes(notesGrid);
         renderArchivedSection(archivedGrid);
-        updateArchivedCount();
+        updateStats();
       } catch (error) {
         showError('Failed to delete note', error);
-      } finally {
         hideLoading();
       }
     }
@@ -340,7 +404,7 @@ function setFilter(filter) {
   const archivedGrid = document.getElementById('archivedGrid');
   renderNotes(notesGrid);
   renderArchivedSection(archivedGrid);
-  updateArchivedCount();
+  updateStats();
   // update active class on buttons and aria-pressed
   document.querySelectorAll('.filter-btn').forEach((b) => {
     const isActive = b.dataset.filter === currentFilter;
@@ -360,7 +424,7 @@ async function mount() {
 
   renderNotes(notesGrid);
   renderArchivedSection(archivedGrid);
-  updateArchivedCount();
+  updateStats();
 
   // Listen to note click (view detail)
   document.body.addEventListener('note-click', (e) => {
@@ -460,7 +524,7 @@ async function mount() {
 
       renderNotes(notesGrid);
       renderArchivedSection(archivedGrid);
-      updateArchivedCount();
+      updateStats();
     } catch (error) {
       showError('Failed to process note', error);
     } finally {
@@ -493,7 +557,7 @@ async function mount() {
         archivedStore.delete(id);
         renderNotes(notesGrid);
         renderArchivedSection(archivedGrid);
-        updateArchivedCount();
+        updateStats();
         showSuccess('Note deleted!');
       } catch (error) {
         showError('Failed to delete note', error);
@@ -535,7 +599,7 @@ async function mount() {
         );
         renderNotes(notesGrid);
         renderArchivedSection(archivedGrid);
-        updateArchivedCount();
+        updateStats();
         showSuccess('All notes restored!');
       } catch (error) {
         showError('Failed to restore all notes', error);
@@ -588,7 +652,7 @@ async function mount() {
           );
           renderNotes(notesGrid);
           renderArchivedSection(archivedGrid);
-          updateArchivedCount();
+          updateStats();
           showSuccess('All archived notes deleted!');
         } catch (error) {
           showError('Failed to delete all archived notes', error);
@@ -654,6 +718,24 @@ async function mount() {
     b.classList.toggle('active', isActive);
     b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
   });
+
+  // Warn before leaving if note input has unsaved changes
+  window.addEventListener('beforeunload', (e) => {
+    const noteInput = document.querySelector('note-input');
+    if (noteInput) {
+      const titleInput = noteInput.shadowRoot.querySelector('#noteTitle');
+      const bodyInput = noteInput.shadowRoot.querySelector('#noteBody');
+      const hasContent =
+        (titleInput && titleInput.value.trim()) ||
+        (bodyInput && bodyInput.value.trim());
+
+      if (hasContent) {
+        e.preventDefault();
+        // eslint-disable-next-line no-param-reassign
+        e.returnValue = '';
+      }
+    }
+  });
 }
 
 // mount on DOMContentLoaded
@@ -667,12 +749,15 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker
       .register('/service-worker.js')
       .then((registration) => {
+        // eslint-disable-next-line no-console
         console.log('ServiceWorker registered:', registration);
       })
       .catch((error) => {
-        console.log('ServiceWorker registration failed:', error);
+        // eslint-disable-next-line no-console
+        console.error('ServiceWorker registration failed:', error);
       });
   });
 }
 
 export { notesStore, archivedStore };
+
