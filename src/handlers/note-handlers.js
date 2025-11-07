@@ -33,7 +33,9 @@ export async function handleCreateNote(detail, onSuccess) {
       throw new Error('Invalid note returned from API');
     }
     
-    addNote(newNote);
+    // Fetch the complete note from API to ensure we have all data
+    const completeNote = await NotesAPI.getSingleNote(newNote.id);
+    addNote(completeNote);
     showSuccess(MESSAGES.SUCCESS.NOTE_CREATED);
     if (onSuccess) onSuccess();
   } catch (error) {
@@ -122,7 +124,10 @@ export async function handleArchiveNote(id, onSuccess) {
   try {
     loadingManager.show(MESSAGES.LOADING.ARCHIVING, MESSAGES.WAIT);
     await NotesAPI.archiveNote(id);
+    
+    // Move note to archived store locally
     archiveNoteInStore(id);
+    
     showSuccess(MESSAGES.SUCCESS.NOTE_ARCHIVED);
     if (onSuccess) onSuccess();
   } catch (error) {
@@ -141,7 +146,10 @@ export async function handleUnarchiveNote(id, onSuccess) {
   try {
     loadingManager.show(MESSAGES.LOADING.UNARCHIVING, MESSAGES.WAIT);
     await NotesAPI.unarchiveNote(id);
+    
+    // Move note to active store locally
     unarchiveNoteInStore(id);
+    
     showSuccess(MESSAGES.SUCCESS.NOTE_UNARCHIVED);
     if (onSuccess) onSuccess();
   } catch (error) {
