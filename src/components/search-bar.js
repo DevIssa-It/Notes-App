@@ -43,6 +43,17 @@ template.innerHTML = `
       color: var(--text-secondary);
     }
 
+    /* Hide default browser search clear button */
+    .search-input::-webkit-search-cancel-button {
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .search-input::-webkit-search-decoration {
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
     .search-icon {
       position: absolute;
       right: 18px;
