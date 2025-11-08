@@ -50,7 +50,14 @@ template.innerHTML = `
       transform: translateY(-50%);
       color: var(--text-secondary);
       pointer-events: none;
-      transition: color 250ms ease;
+      transition: all 250ms ease;
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .search-icon.hidden {
+      opacity: 0;
+      visibility: hidden;
     }
 
     .search-input:focus ~ .search-icon {
@@ -59,19 +66,24 @@ template.innerHTML = `
 
     .clear-btn {
       position: absolute;
-      right: 50px;
+      right: 18px;
       top: 50%;
       transform: translateY(-50%);
       background: transparent;
       border: none;
       color: var(--text-secondary);
-      font-size: 1.2rem;
+      font-size: 1.4rem;
       cursor: pointer;
       padding: 4px 8px;
       border-radius: 8px;
       transition: all 200ms ease;
       opacity: 0;
       visibility: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
     }
 
     .clear-btn.visible {
@@ -82,6 +94,11 @@ template.innerHTML = `
     .clear-btn:hover {
       background: rgba(124, 58, 237, 0.2);
       color: var(--text-primary);
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .clear-btn:active {
+      transform: translateY(-50%) scale(0.95);
     }
 
     .search-result {
@@ -118,6 +135,7 @@ class SearchBar extends HTMLElement {
 
     this.input = this.shadowRoot.querySelector('.search-input');
     this.clearBtn = this.shadowRoot.querySelector('.clear-btn');
+    this.searchIcon = this.shadowRoot.querySelector('.search-icon');
     this.resultEl = this.shadowRoot.querySelector('.search-result');
 
     this.onInput = this.onInput.bind(this);
@@ -150,11 +168,13 @@ class SearchBar extends HTMLElement {
   onInput(e) {
     const query = e.target.value.trim();
 
-    // Show/hide clear button
+    // Show/hide clear button and search icon
     if (query) {
       this.clearBtn.classList.add('visible');
+      this.searchIcon.classList.add('hidden');
     } else {
       this.clearBtn.classList.remove('visible');
+      this.searchIcon.classList.remove('hidden');
     }
 
     // Clear existing timeout
@@ -176,6 +196,7 @@ class SearchBar extends HTMLElement {
   onClear() {
     this.input.value = '';
     this.clearBtn.classList.remove('visible');
+    this.searchIcon.classList.remove('hidden');
     this.resultEl.textContent = '';
     this.resultEl.classList.remove('active');
 
