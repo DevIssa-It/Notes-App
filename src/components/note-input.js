@@ -167,6 +167,9 @@ class NoteInput extends HTMLElement {
     this.onSubmit = this.onSubmit.bind(this);
     this.onReset = this.onReset.bind(this);
     this.onInput = this.onInput.bind(this);
+    
+    // Auto-save timeout
+    this.autoSaveTimeout = null;
   }
 
   connectedCallback() {
@@ -176,6 +179,9 @@ class NoteInput extends HTMLElement {
     this.bodyInput = this.shadowRoot.querySelector('textarea[name="body"]');
     this.submitBtn = this.shadowRoot.getElementById('submitBtn');
     this.resetBtn = this.shadowRoot.getElementById('resetBtn');
+
+    // Load draft from localStorage
+    this.loadDraft();
 
     // Add event listeners
     if (this.form) this.form.addEventListener('submit', this.onSubmit);
@@ -211,6 +217,12 @@ class NoteInput extends HTMLElement {
       this.bodyInput.style.outline = 'none';
     }
     this.updateButtonState();
+    
+    // Auto-save draft after 1 second of inactivity
+    clearTimeout(this.autoSaveTimeout);
+    this.autoSaveTimeout = setTimeout(() => {
+      this.saveDraft();
+    }, 1000);
   }
 
   updateButtonState() {
@@ -222,6 +234,7 @@ class NoteInput extends HTMLElement {
   onReset(e) {
     e.preventDefault();
     this.form.reset();
+    this.clearDraft();
     this.updateButtonState();
   }
 
@@ -243,7 +256,68 @@ class NoteInput extends HTMLElement {
       })
     );
     this.form.reset();
+    this.clearDraft(); // Clear draft after successful submission
     this.updateButtonState();
+  }
+
+  /**
+   * Save draft to localStorage
+   */
+  saveDraft() {
+    const title = this.titleInput.value.trim();
+    const body = this.bodyInput.value.trim();
+    
+    // Only save if there's content
+    if (title || body) {
+      try {
+        localStorage.setItem('noteDraft', JSON.stringify({ title, body }));
+      } catch (error) {
+        console.error('Failed to save draft:', error);
+      }
+    } else {
+      this.clearDraft();
+    }
+  }
+
+  /**
+   * Load draft from localStorage
+   */
+  loadDraft() {
+    try {
+      const draft = localStorage.getItem('noteDraft');
+      if (draft) {
+        const { title, body } = JSON.parse(draft);
+        if (title || body) {
+          this.titleInput.value = title || '';
+          this.bodyInput.value = body || '';
+          this.updateButtonState();
+          
+          // Draft restored successfully
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load draft:', error);
+    }
+  }
+
+  /**
+   * Clear draft from localStorage
+   */
+  clearDraft() {
+    try {
+      localStorage.removeItem('noteDraft');
+    } catch (error) {
+      console.error('Failed to clear draft:', error);
+    }
+  }
+
+  /**
+   * Check if there are unsaved changes
+   */
+  hasUnsavedChanges() {
+    const title = this.titleInput.value.trim();
+    const body = this.bodyInput.value.trim();
+    return !!(title || body);
   }
 }
 
