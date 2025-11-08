@@ -129,10 +129,12 @@ template.innerHTML = `
     .meta{
       display:flex;
       justify-content:space-between;
-      align-items:center;
-      margin-top:4px;
-      gap:8px;
+      align-items:flex-end;
+      margin-top:auto;
+      gap:12px;
       flex-wrap:wrap;
+      padding-top:8px;
+      border-top:1px solid rgba(124, 58, 237, 0.08);
     }
     .created{
       font-size:0.8rem;
@@ -145,6 +147,7 @@ template.innerHTML = `
       align-items: center;
       gap: 6px;
       border: 1px solid rgba(124, 58, 237, 0.1);
+      flex-shrink:0;
     }
     .created::before{
       content: '🕐';
@@ -152,17 +155,19 @@ template.innerHTML = `
     }
     .btns{
       display:flex;
-      gap:8px;
+      gap:6px;
       flex-wrap:wrap;
+      justify-content:flex-end;
+      align-items:center;
     }
     .btn{
       background: linear-gradient(135deg, var(--input-bg), var(--input-bg-focus));
       border:2px solid var(--card-border);
       color: var(--text-primary);
-      padding:10px 16px;
-      border-radius:12px;
+      padding:8px 14px;
+      border-radius:10px;
       cursor:pointer;
-      font-size:0.92rem;
+      font-size:0.85rem;
       font-weight:600;
       transition:all 250ms cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
@@ -171,7 +176,14 @@ template.innerHTML = `
       white-space:nowrap;
       display:inline-flex;
       align-items:center;
-      gap:7px;
+      gap:6px;
+      flex-shrink:0;
+    }
+    .btn i{
+      font-size:0.8rem;
+    }
+    .btn-text{
+      font-size:0.82rem;
     }
     .btn::before{
       content:'';
@@ -190,21 +202,51 @@ template.innerHTML = `
       height:300px;
     }
     .btn:hover{
+      transform:translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+    .btn:active{
+      transform:translateY(0);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+    .copyBtn{
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(8, 145, 178, 0.05));
+      border-color: rgba(6, 182, 212, 0.3);
+      color: #0891b2;
+    }
+    .copyBtn:hover{
+      background:linear-gradient(135deg, #06b6d4, #0891b2);
+      border-color:transparent;
+      color:white;
+      box-shadow:0 4px 16px rgba(6, 182, 212, 0.4);
+    }
+    .copyBtn:hover::before{
+      background:rgba(255, 255, 255, 0.1);
+    }
+    .archiveBtn{
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(99, 102, 241, 0.05));
+      border-color: rgba(124, 58, 237, 0.3);
+      color: var(--accent);
+    }
+    .archiveBtn:hover{
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
       border-color: transparent;
       color: white;
-      transform:translateY(-3px);
-      box-shadow: 0 6px 20px rgba(124, 58, 237, 0.3);
+      box-shadow: 0 4px 16px rgba(124, 58, 237, 0.4);
     }
-    .btn:active{
-      transform:translateY(-1px);
-      box-shadow: 0 2px 8px rgba(124, 58, 237, 0.2);
+    .archiveBtn:hover::before{
+      background:rgba(255, 255, 255, 0.1);
+    }
+    .deleteBtn{
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(239, 68, 68, 0.05));
+      border-color: rgba(220, 38, 38, 0.3);
+      color: #dc2626;
     }
     .deleteBtn:hover{
       background:linear-gradient(135deg, #dc2626, #ef4444);
       border-color:transparent;
       color:white;
-      box-shadow:0 6px 20px rgba(220,38,38,0.4);
+      box-shadow:0 4px 16px rgba(220, 38, 38, 0.4);
     }
     .deleteBtn:hover::before{
       background:rgba(255, 255, 255, 0.1);
@@ -315,12 +357,24 @@ template.innerHTML = `
       50% { transform: scale(1.15); }
       75% { transform: scale(1.25); }
     }
-    .copyBtn:hover{
-      background:#06b6d4;
-      border-color:#0891b2;
-      color:white;
-      box-shadow:0 6px 16px rgba(6,182,212,0.4), 0 2px 6px rgba(0,0,0,0.4);
+    
+    /* Responsive: hide button text on small cards */
+    @media (max-width: 480px) {
+      .btn-text{
+        display:none;
+      }
+      .btn{
+        padding:8px 10px;
+        gap:0;
+      }
+      .btn i{
+        font-size:0.9rem;
+      }
+      .btns{
+        gap:4px;
+      }
     }
+    
     .archived{opacity:0.6}
   </style>
   <article class="note-card">
