@@ -10,7 +10,7 @@
 
 ## 🌐 Live Demo
 
-**🚀 [https://notesapp-dev.vercel.app/](https://notesapp-dev.vercel.app/)**
+**🚀 [https://notesapp-dev.vercel.app/](https://notes-apps-dev.vercel.app/)**
 
 Aplikasi sudah di-deploy di Vercel dan siap digunakan! Coba semua fitur-fiturnya:
 - ✅ Create, Archive, Delete notes
