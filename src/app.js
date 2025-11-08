@@ -13,6 +13,7 @@ import './components/note-detail.js';
 import './components/note-edit-modal.js';
 import './components/theme-toggle.js';
 import './components/note-stats.js';
+import './components/keyboard-shortcuts.js';
 
 // Import state management
 import {

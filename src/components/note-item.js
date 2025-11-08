@@ -1,3 +1,5 @@
+import { formatRelativeTime } from '../utils.js';
+
 const template = document.createElement('template');
 template.innerHTML = `
   <style>
@@ -326,11 +328,16 @@ class NoteItem extends HTMLElement {
     this.titleEl.textContent = n.title || '';
     this.bodyEl.textContent = n.body || '';
     
-    // Render created date
+    // Render created date with relative time
     const createdAt = n.createdAt || this.getAttribute('created-at');
     this.createdEl.textContent = createdAt
-      ? new Date(createdAt).toLocaleString()
+      ? formatRelativeTime(createdAt)
       : '';
+    
+    // Add tooltip with full date
+    if (createdAt) {
+      this.createdEl.title = new Date(createdAt).toLocaleString();
+    }
     
     // Update archived state and button label
     const btnText = this.archiveBtn.querySelector('.btn-text');

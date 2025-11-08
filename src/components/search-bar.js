@@ -122,6 +122,9 @@ class SearchBar extends HTMLElement {
 
     this.onInput = this.onInput.bind(this);
     this.onClear = this.onClear.bind(this);
+    
+    // Debounce timeout
+    this.searchTimeout = null;
   }
 
   connectedCallback() {
@@ -154,14 +157,20 @@ class SearchBar extends HTMLElement {
       this.clearBtn.classList.remove('visible');
     }
 
-    // Emit search event
-    this.dispatchEvent(
-      new CustomEvent('search', {
-        detail: { query },
-        bubbles: true,
-        composed: true,
-      })
-    );
+    // Clear existing timeout
+    clearTimeout(this.searchTimeout);
+
+    // Debounce search - wait 300ms after user stops typing
+    this.searchTimeout = setTimeout(() => {
+      // Emit search event
+      this.dispatchEvent(
+        new CustomEvent('search', {
+          detail: { query },
+          bubbles: true,
+          composed: true,
+        })
+      );
+    }, 300);
   }
 
   onClear() {
@@ -170,7 +179,10 @@ class SearchBar extends HTMLElement {
     this.resultEl.textContent = '';
     this.resultEl.classList.remove('active');
 
-    // Emit search event with empty query
+    // Clear pending search timeout
+    clearTimeout(this.searchTimeout);
+
+    // Emit search event with empty query immediately (no debounce for clear)
     this.dispatchEvent(
       new CustomEvent('search', {
         detail: { query: '' },

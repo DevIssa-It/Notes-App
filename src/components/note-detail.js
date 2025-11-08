@@ -1,3 +1,5 @@
+import { formatRelativeTime } from '../utils.js';
+
 class NoteDetail extends HTMLElement {
   constructor() {
     super();
@@ -285,6 +287,10 @@ class NoteDetail extends HTMLElement {
             <div class="meta-item">
               <i class="fas fa-calendar"></i>
               Created: ${this._formatDate(this._note.createdAt)}
+            </div>
+            <div class="meta-item">
+              <i class="fas fa-clock"></i>
+              ${formatRelativeTime(this._note.createdAt)}
             </div>
             <div class="meta-item">
               <i class="fas fa-id-badge"></i>
