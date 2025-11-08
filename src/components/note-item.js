@@ -183,6 +183,35 @@ template.innerHTML = `
     .pinBtn:hover{
       transform:scale(1.1) rotate(15deg);
     }
+    .favoriteBtn{
+      position:absolute;
+      top:12px;
+      right:52px;
+      background: var(--input-bg);
+      border:2px solid var(--card-border);
+      color: var(--text-secondary);
+      padding:6px 10px;
+      border-radius:8px;
+      cursor:pointer;
+      font-size:1rem;
+      transition:all 220ms ease;
+      opacity:0;
+      visibility:hidden;
+    }
+    .note-card:hover .favoriteBtn{
+      opacity:1;
+      visibility:visible;
+    }
+    .favoriteBtn.favorited{
+      opacity:1;
+      visibility:visible;
+      background:#ef4444;
+      border-color:#dc2626;
+      color:white;
+    }
+    .favoriteBtn:hover{
+      transform:scale(1.15);
+    }
     .copyBtn:hover{
       background:#06b6d4;
       border-color:#0891b2;
@@ -192,6 +221,9 @@ template.innerHTML = `
     .archived{opacity:0.6}
   </style>
   <article class="note-card">
+    <button class="favoriteBtn" title="Add to favorites">
+      <i class="fas fa-heart"></i>
+    </button>
     <button class="pinBtn" title="Pin note">
       <i class="fas fa-thumbtack"></i>
     </button>
@@ -219,7 +251,7 @@ template.innerHTML = `
 
 class NoteItem extends HTMLElement {
   static get observedAttributes() {
-    return ['data-id', 'archived', 'created-at', 'pinned'];
+    return ['data-id', 'archived', 'created-at', 'pinned', 'favorited'];
   }
 
   constructor() {
@@ -232,11 +264,13 @@ class NoteItem extends HTMLElement {
     this.archiveBtn = this.shadowRoot.querySelector('.archiveBtn');
     this.deleteBtn = this.shadowRoot.querySelector('.deleteBtn');
     this.pinBtn = this.shadowRoot.querySelector('.pinBtn');
+    this.favoriteBtn = this.shadowRoot.querySelector('.favoriteBtn');
     this.copyBtn = this.shadowRoot.querySelector('.copyBtn');
 
     this.onArchive = this.onArchive.bind(this);
     this.onDelete = this.onDelete.bind(this);
     this.onPin = this.onPin.bind(this);
+    this.onFavorite = this.onFavorite.bind(this);
     this.onCopy = this.onCopy.bind(this);
     this.onKeydown = this.onKeydown.bind(this);
     this.onClick = this.onClick.bind(this);
@@ -246,6 +280,7 @@ class NoteItem extends HTMLElement {
     this.archiveBtn.addEventListener('click', this.onArchive);
     this.deleteBtn.addEventListener('click', this.onDelete);
     this.pinBtn.addEventListener('click', this.onPin);
+    this.favoriteBtn.addEventListener('click', this.onFavorite);
     this.copyBtn.addEventListener('click', this.onCopy);
     this.addEventListener('keydown', this.onKeydown);
     
@@ -267,6 +302,7 @@ class NoteItem extends HTMLElement {
     this.archiveBtn.removeEventListener('click', this.onArchive);
     this.deleteBtn.removeEventListener('click', this.onDelete);
     this.pinBtn.removeEventListener('click', this.onPin);
+    this.favoriteBtn.removeEventListener('click', this.onFavorite);
     this.copyBtn.removeEventListener('click', this.onCopy);
     this.removeEventListener('keydown', this.onKeydown);
     
@@ -298,6 +334,12 @@ class NoteItem extends HTMLElement {
       this.removeAttribute('pinned');
     }
     
+    if (noteData.favorited) {
+      this.setAttribute('favorited', 'true');
+    } else {
+      this.removeAttribute('favorited');
+    }
+    
     // Use dataset to store title and body to avoid conflicts
     this.dataset.noteTitle = noteData.title || '';
     this.dataset.noteBody = noteData.body || '';
@@ -317,6 +359,7 @@ class NoteItem extends HTMLElement {
       createdAt: this.getAttribute('created-at'),
       archived: this.hasAttribute('archived'),
       pinned: this.hasAttribute('pinned'),
+      favorited: this.hasAttribute('favorited'),
     };
   }
 
@@ -360,6 +403,21 @@ class NoteItem extends HTMLElement {
     
     const isPinned = this.hasAttribute('pinned');
     const eventName = isPinned ? 'note-unpin' : 'note-pin';
+    
+    this.dispatchEvent(
+      new CustomEvent(eventName, {
+        detail: { id: this.getAttribute('data-id') },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
+  onFavorite(e) {
+    e.stopPropagation(); // Prevent card click event
+    
+    const isFavorited = this.hasAttribute('favorited');
+    const eventName = isFavorited ? 'note-unfavorite' : 'note-favorite';
     
     this.dispatchEvent(
       new CustomEvent(eventName, {
@@ -454,6 +512,15 @@ class NoteItem extends HTMLElement {
       card.classList.remove('pinned');
       this.pinBtn.classList.remove('pinned');
       this.pinBtn.title = 'Pin note';
+    }
+    
+    // Update favorited state
+    if (this.hasAttribute('favorited')) {
+      this.favoriteBtn.classList.add('favorited');
+      this.favoriteBtn.title = 'Remove from favorites';
+    } else {
+      this.favoriteBtn.classList.remove('favorited');
+      this.favoriteBtn.title = 'Add to favorites';
     }
     
     // Update archived state and button label

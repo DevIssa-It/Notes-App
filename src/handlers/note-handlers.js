@@ -260,3 +260,65 @@ export function handleUnpinNote(id, onSuccess) {
   showSuccess('Note unpinned');
   if (onSuccess) onSuccess();
 }
+
+/**
+ * Get favorited notes from localStorage
+ * @returns {Set<string>} Set of favorited note IDs
+ */
+function getFavoritedNotes() {
+  try {
+    const favorited = localStorage.getItem('favoritedNotes');
+    return favorited ? new Set(JSON.parse(favorited)) : new Set();
+  } catch (error) {
+    console.error('Failed to load favorited notes:', error);
+    return new Set();
+  }
+}
+
+/**
+ * Save favorited notes to localStorage
+ * @param {Set<string>} favoritedSet - Set of favorited note IDs
+ */
+function saveFavoritedNotes(favoritedSet) {
+  try {
+    localStorage.setItem('favoritedNotes', JSON.stringify([...favoritedSet]));
+  } catch (error) {
+    console.error('Failed to save favorited notes:', error);
+  }
+}
+
+/**
+ * Check if a note is favorited
+ * @param {string} id - Note ID
+ * @returns {boolean} True if favorited
+ */
+export function isNoteFavorited(id) {
+  const favorited = getFavoritedNotes();
+  return favorited.has(id);
+}
+
+/**
+ * Handle note favoriting
+ * @param {string} id - Note ID
+ * @param {Function} onSuccess - Success callback
+ */
+export function handleFavoriteNote(id, onSuccess) {
+  const favorited = getFavoritedNotes();
+  favorited.add(id);
+  saveFavoritedNotes(favorited);
+  showSuccess('❤️ Added to favorites');
+  if (onSuccess) onSuccess();
+}
+
+/**
+ * Handle note unfavoriting
+ * @param {string} id - Note ID
+ * @param {Function} onSuccess - Success callback
+ */
+export function handleUnfavoriteNote(id, onSuccess) {
+  const favorited = getFavoritedNotes();
+  favorited.delete(id);
+  saveFavoritedNotes(favorited);
+  showSuccess('Removed from favorites');
+  if (onSuccess) onSuccess();
+}

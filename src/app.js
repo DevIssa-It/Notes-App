@@ -33,6 +33,7 @@ import {
   setSearchQuery,
   setCurrentFilter,
   getCurrentFilter,
+  setCurrentSort,
 } from './renderers/notes-renderer.js';
 
 // Import handlers
@@ -44,6 +45,8 @@ import {
   handleUnarchiveNote,
   handlePinNote,
   handleUnpinNote,
+  handleFavoriteNote,
+  handleUnfavoriteNote,
 } from './handlers/note-handlers.js';
 
 import {
@@ -181,11 +184,20 @@ async function mount() {
   const editModal = document.querySelector('note-edit-modal');
   const restoreAllBtn = document.getElementById('restoreAllBtn');
   const deleteAllArchivedBtn = document.getElementById('deleteAllArchivedBtn');
+  const sortSelect = document.getElementById('sortSelect');
 
   // Initial render
   refreshViews();
 
   // === EVENT LISTENERS ===
+
+  // Sort functionality
+  if (sortSelect) {
+    sortSelect.addEventListener('change', (e) => {
+      setCurrentSort(e.target.value);
+      refreshViews();
+    });
+  }
 
   // Search functionality
   document.body.addEventListener('search', (e) => {
@@ -242,6 +254,15 @@ async function mount() {
 
   document.body.addEventListener('note-unpin', (e) => {
     handleUnpinNote(e.detail.id, refreshViews);
+  });
+
+  // Note item favorite/unfavorite
+  document.body.addEventListener('note-favorite', (e) => {
+    handleFavoriteNote(e.detail.id, refreshViews);
+  });
+
+  document.body.addEventListener('note-unfavorite', (e) => {
+    handleUnfavoriteNote(e.detail.id, refreshViews);
   });
 
   // Note item delete

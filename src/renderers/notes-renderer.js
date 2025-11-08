@@ -3,11 +3,28 @@
  */
 
 import { FILTERS } from '../constants.js';
-import { isNotePinned } from '../handlers/note-handlers.js';
+import { isNotePinned, isNoteFavorited } from '../handlers/note-handlers.js';
 
 // Current state
 let currentSearchQuery = '';
 let currentFilter = FILTERS.ALL;
+let currentSort = 'date-desc'; // Default sort
+
+/**
+ * Set current sort option
+ * @param {string} sort - Sort option
+ */
+export function setCurrentSort(sort) {
+  currentSort = sort;
+}
+
+/**
+ * Get current sort option
+ * @returns {string} Current sort
+ */
+export function getCurrentSort() {
+  return currentSort;
+}
 
 /**
  * Set current search query
@@ -80,19 +97,36 @@ export function renderNotes(container, notes) {
     const aPinned = isNotePinned(a.id);
     const bPinned = isNotePinned(b.id);
     
+    // Pinned notes always first
     if (aPinned && !bPinned) return -1;
     if (!aPinned && bPinned) return 1;
     
-    // If both pinned or both not pinned, sort by date (newest first)
-    return new Date(b.createdAt) - new Date(a.createdAt);
+    // Apply selected sort for non-pinned or both pinned
+    switch (currentSort) {
+      case 'date-desc':
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      case 'date-asc':
+        return new Date(a.createdAt) - new Date(b.createdAt);
+      case 'title-asc':
+        return a.title.localeCompare(b.title);
+      case 'title-desc':
+        return b.title.localeCompare(a.title);
+      case 'length-desc':
+        return b.body.length - a.body.length;
+      case 'length-asc':
+        return a.body.length - b.body.length;
+      default:
+        return new Date(b.createdAt) - new Date(a.createdAt);
+    }
   });
 
   arr.forEach((noteData) => {
     const noteItem = document.createElement('note-item');
-    // Add pinned property to note data
+    // Add pinned and favorited properties to note data
     noteItem.note = {
       ...noteData,
       pinned: isNotePinned(noteData.id),
+      favorited: isNoteFavorited(noteData.id),
     };
     container.appendChild(noteItem);
   });
