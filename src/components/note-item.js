@@ -213,18 +213,31 @@ template.innerHTML = `
       position:absolute;
       top:14px;
       right:14px;
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(10px);
-      border:2px solid rgba(245, 158, 11, 0.2);
-      color: var(--text-secondary);
-      padding:8px 12px;
-      border-radius:10px;
+      border:2px solid rgba(245, 158, 11, 0.3);
+      color: #78716c;
+      padding:6px 12px;
+      border-radius:8px;
       cursor:pointer;
-      font-size:1.1rem;
+      font-size:0.82rem;
+      font-weight:600;
       transition:all 250ms cubic-bezier(0.4, 0, 0.2, 1);
       opacity:0;
       visibility:hidden;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      display:flex;
+      align-items:center;
+      gap:5px;
+      z-index:10;
+      pointer-events:auto;
+    }
+    .pinBtn i{
+      font-size:0.9rem;
+      pointer-events:none;
+    }
+    .pinBtn span{
+      pointer-events:none;
     }
     .note-card:hover .pinBtn{
       opacity:1;
@@ -239,25 +252,43 @@ template.innerHTML = `
       box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
     }
     .pinBtn:hover{
-      transform:scale(1.15) rotate(15deg);
+      transform:translateY(-2px);
       box-shadow: 0 4px 16px rgba(245, 158, 11, 0.5);
+      background:linear-gradient(135deg, #fbbf24, #f59e0b);
+      border-color:#f59e0b;
+    }
+    .pinBtn.pinned:hover{
+      background:linear-gradient(135deg, #fbbf24, #f59e0b);
     }
     .favoriteBtn{
       position:absolute;
       top:14px;
-      right:60px;
-      background: rgba(255, 255, 255, 0.9);
+      right:90px;
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(10px);
-      border:2px solid rgba(239, 68, 68, 0.2);
-      color: var(--text-secondary);
-      padding:8px 12px;
-      border-radius:10px;
+      border:2px solid rgba(239, 68, 68, 0.3);
+      color: #78716c;
+      padding:6px 12px;
+      border-radius:8px;
       cursor:pointer;
-      font-size:1.1rem;
+      font-size:0.82rem;
+      font-weight:600;
       transition:all 250ms cubic-bezier(0.4, 0, 0.2, 1);
       opacity:0;
       visibility:hidden;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      display:flex;
+      align-items:center;
+      gap:5px;
+      z-index:10;
+      pointer-events:auto;
+    }
+    .favoriteBtn i{
+      font-size:0.9rem;
+      pointer-events:none;
+    }
+    .favoriteBtn span{
+      pointer-events:none;
     }
     .note-card:hover .favoriteBtn{
       opacity:1;
@@ -295,9 +326,11 @@ template.innerHTML = `
   <article class="note-card">
     <button class="favoriteBtn" title="Add to favorites">
       <i class="fas fa-heart"></i>
+      <span>Favorit</span>
     </button>
     <button class="pinBtn" title="Pin note">
-      <i class="fas fa-thumbtack"></i>
+      <i class="fas fa-map-pin"></i>
+      <span>Pin</span>
     </button>
     <div class="title"></div>
     <div class="body"></div>
@@ -472,6 +505,7 @@ class NoteItem extends HTMLElement {
 
   onPin(e) {
     e.stopPropagation(); // Prevent card click event
+    e.preventDefault(); // Prevent default action
     
     const isPinned = this.hasAttribute('pinned');
     const eventName = isPinned ? 'note-unpin' : 'note-pin';
@@ -487,6 +521,7 @@ class NoteItem extends HTMLElement {
 
   onFavorite(e) {
     e.stopPropagation(); // Prevent card click event
+    e.preventDefault(); // Prevent default action
     
     const isFavorited = this.hasAttribute('favorited');
     const eventName = isFavorited ? 'note-unfavorite' : 'note-favorite';
