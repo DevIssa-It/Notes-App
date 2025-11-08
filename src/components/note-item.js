@@ -13,24 +13,26 @@ template.innerHTML = `
     
     .note-card{
       box-sizing:border-box;
-      background: var(--card-gradient);
-      padding:20px;
-      border-radius:16px;
+      background: linear-gradient(135deg, var(--card-gradient), var(--input-bg));
+      padding:22px;
+      border-radius:18px;
       border:2px solid var(--card-border);
-      box-shadow: var(--shadow-md);
-      height:280px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+      height:300px;
       display:flex;
       flex-direction:column;
-      gap:12px;
-      transition:transform 250ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1), border-color 250ms ease, background 250ms ease;
+      gap:14px;
+      transition:transform 300ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1), border-color 300ms ease, background 300ms ease;
       position:relative;
       overflow:hidden;
       width:100%;
       cursor:pointer;
+      backdrop-filter: blur(10px);
     }
     .note-card.pinned {
       border-color: #f59e0b;
-      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3), var(--shadow-md);
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), var(--card-gradient));
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.25), 0 2px 8px rgba(0, 0, 0, 0.1);
     }
     .note-card::before{
       content:'';
@@ -38,55 +40,91 @@ template.innerHTML = `
       top:0;
       left:0;
       right:0;
-      height:4px;
-      background:linear-gradient(90deg,#7c3aed,#06b6d4);
+      height:5px;
+      background:linear-gradient(90deg,#7c3aed,#06b6d4,#10b981);
       opacity:0;
-      transition:opacity 250ms ease;
+      transition:opacity 300ms ease;
+      box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
     }
     .note-card.pinned::before{
-      background:linear-gradient(90deg,#f59e0b,#eab308);
+      background:linear-gradient(90deg,#f59e0b,#eab308,#fbbf24);
       opacity:1;
     }
+    .note-card::after{
+      content:'';
+      position:absolute;
+      bottom:0;
+      right:0;
+      width:150px;
+      height:150px;
+      background:radial-gradient(circle, rgba(124,58,237,0.05) 0%, transparent 70%);
+      opacity:0;
+      transition:opacity 300ms ease;
+      pointer-events:none;
+    }
     .note-card:hover{
-      transform:translateY(-4px);
-      box-shadow: var(--shadow-lg);
-      border-color:rgba(124,58,237,0.6);
+      transform:translateY(-6px) scale(1.02);
+      box-shadow: 0 12px 32px rgba(124, 58, 237, 0.15), 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-color:rgba(124,58,237,0.5);
     }
     .note-card:hover::before{
       opacity:1;
     }
+    .note-card:hover::after{
+      opacity:1;
+    }
     .title{
       font-weight:700;
-      font-size:1.05rem;
+      font-size:1.1rem;
       color: var(--text-primary);
       letter-spacing:0.01em;
       word-wrap:break-word;
       overflow-wrap:break-word;
+      line-height:1.4;
+      position:relative;
+      padding-bottom:8px;
+      margin-bottom:4px;
+    }
+    .title::after{
+      content:'';
+      position:absolute;
+      bottom:0;
+      left:0;
+      width:40px;
+      height:3px;
+      background:linear-gradient(90deg, var(--accent), var(--accent-2));
+      border-radius:2px;
+      transition:width 300ms ease;
+    }
+    .note-card:hover .title::after{
+      width:80px;
     }
     .body{
       white-space:pre-wrap;
-      font-size:0.9rem;
+      font-size:0.92rem;
       color: var(--text-secondary);
       flex:1;
-      line-height:1.5;
+      line-height:1.6;
       word-wrap:break-word;
       overflow-wrap:break-word;
       overflow-y:auto;
       scrollbar-width:thin;
-      scrollbar-color: var(--card-border) transparent;
+      scrollbar-color: rgba(124, 58, 237, 0.3) transparent;
+      padding-right:4px;
     }
     .body::-webkit-scrollbar{
       width:6px;
     }
     .body::-webkit-scrollbar-track{
       background:transparent;
+      border-radius:3px;
     }
     .body::-webkit-scrollbar-thumb{
-      background: var(--card-border);
+      background: linear-gradient(180deg, var(--accent), var(--accent-2));
       border-radius:3px;
     }
     .body::-webkit-scrollbar-thumb:hover{
-      background: var(--input-border);
+      background: linear-gradient(180deg, var(--accent-2), var(--accent));
     }
     .meta{
       display:flex;
@@ -97,9 +135,20 @@ template.innerHTML = `
       flex-wrap:wrap;
     }
     .created{
-      font-size:0.78rem;
+      font-size:0.8rem;
       color: var(--muted);
       white-space:nowrap;
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.08), rgba(6, 182, 212, 0.08));
+      padding: 6px 12px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(124, 58, 237, 0.1);
+    }
+    .created::before{
+      content: '🕐';
+      font-size: 0.9rem;
     }
     .btns{
       display:flex;
@@ -107,67 +156,75 @@ template.innerHTML = `
       flex-wrap:wrap;
     }
     .btn{
-      background: var(--input-bg);
+      background: linear-gradient(135deg, var(--input-bg), var(--input-bg-focus));
       border:2px solid var(--card-border);
       color: var(--text-primary);
-      padding:9px 14px;
+      padding:10px 16px;
       border-radius:12px;
       cursor:pointer;
-      font-size:0.95rem;
+      font-size:0.92rem;
       font-weight:600;
-      transition:all 220ms cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: var(--shadow-sm);
+      transition:all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
       position:relative;
       overflow:hidden;
       white-space:nowrap;
       display:inline-flex;
       align-items:center;
-      gap:6px;
+      gap:7px;
     }
     .btn::before{
       content:'';
       position:absolute;
-      top:0;
-      left:-100%;
-      width:100%;
-      height:100%;
-      background:linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-      transition:left 400ms ease;
+      top:50%;
+      left:50%;
+      width:0;
+      height:0;
+      border-radius:50%;
+      background:rgba(124, 58, 237, 0.1);
+      transform:translate(-50%, -50%);
+      transition:width 400ms ease, height 400ms ease;
     }
     .btn:hover::before{
-      left:100%;
+      width:300px;
+      height:300px;
     }
     .btn:hover{
-      background: var(--input-bg-focus);
-      border-color: var(--accent);
-      color: var(--text-primary);
-      transform:translateY(-2px);
-      box-shadow: var(--shadow-md);
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-color: transparent;
+      color: white;
+      transform:translateY(-3px);
+      box-shadow: 0 6px 20px rgba(124, 58, 237, 0.3);
     }
     .btn:active{
-      transform:translateY(0);
-      box-shadow: var(--shadow-sm);
+      transform:translateY(-1px);
+      box-shadow: 0 2px 8px rgba(124, 58, 237, 0.2);
     }
     .deleteBtn:hover{
-      background:#dc2626;
-      border-color:#ef4444;
+      background:linear-gradient(135deg, #dc2626, #ef4444);
+      border-color:transparent;
       color:white;
-      box-shadow:0 6px 16px rgba(220,38,38,0.4), 0 2px 6px rgba(0,0,0,0.4);
+      box-shadow:0 6px 20px rgba(220,38,38,0.4);
+    }
+    .deleteBtn:hover::before{
+      background:rgba(255, 255, 255, 0.1);
     }
     .pinBtn{
       position:absolute;
-      top:12px;
-      right:12px;
-      background: var(--input-bg);
-      border:2px solid var(--card-border);
+      top:14px;
+      right:14px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border:2px solid rgba(245, 158, 11, 0.2);
       color: var(--text-secondary);
-      padding:6px 10px;
-      border-radius:8px;
+      padding:8px 12px;
+      border-radius:10px;
       cursor:pointer;
-      font-size:1rem;
-      transition:all 220ms ease;
+      font-size:1.1rem;
+      transition:all 250ms cubic-bezier(0.4, 0, 0.2, 1);
       opacity:0;
       visibility:hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
     .note-card:hover .pinBtn{
       opacity:1;
@@ -176,27 +233,31 @@ template.innerHTML = `
     .pinBtn.pinned{
       opacity:1;
       visibility:visible;
-      background:#f59e0b;
-      border-color:#eab308;
+      background:linear-gradient(135deg, #f59e0b, #eab308);
+      border-color:transparent;
       color:white;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
     }
     .pinBtn:hover{
-      transform:scale(1.1) rotate(15deg);
+      transform:scale(1.15) rotate(15deg);
+      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.5);
     }
     .favoriteBtn{
       position:absolute;
-      top:12px;
-      right:52px;
-      background: var(--input-bg);
-      border:2px solid var(--card-border);
+      top:14px;
+      right:60px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border:2px solid rgba(239, 68, 68, 0.2);
       color: var(--text-secondary);
-      padding:6px 10px;
-      border-radius:8px;
+      padding:8px 12px;
+      border-radius:10px;
       cursor:pointer;
-      font-size:1rem;
-      transition:all 220ms ease;
+      font-size:1.1rem;
+      transition:all 250ms cubic-bezier(0.4, 0, 0.2, 1);
       opacity:0;
       visibility:hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
     .note-card:hover .favoriteBtn{
       opacity:1;
@@ -205,12 +266,23 @@ template.innerHTML = `
     .favoriteBtn.favorited{
       opacity:1;
       visibility:visible;
-      background:#ef4444;
-      border-color:#dc2626;
+      background:linear-gradient(135deg, #ef4444, #dc2626);
+      border-color:transparent;
       color:white;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
     }
     .favoriteBtn:hover{
       transform:scale(1.15);
+      box-shadow: 0 4px 16px rgba(239, 68, 68, 0.5);
+    }
+    .favoriteBtn:hover.favorited{
+      animation: heartbeat 0.6s ease-in-out;
+    }
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1.15); }
+      25% { transform: scale(1.3); }
+      50% { transform: scale(1.15); }
+      75% { transform: scale(1.25); }
     }
     .copyBtn:hover{
       background:#06b6d4;
