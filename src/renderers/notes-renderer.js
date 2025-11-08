@@ -3,6 +3,7 @@
  */
 
 import { FILTERS } from '../constants.js';
+import { isNotePinned } from '../handlers/note-handlers.js';
 
 // Current state
 let currentSearchQuery = '';
@@ -74,9 +75,25 @@ export function renderNotes(container, notes) {
     return;
   }
 
+  // Sort notes: pinned notes first, then by creation date
+  arr.sort((a, b) => {
+    const aPinned = isNotePinned(a.id);
+    const bPinned = isNotePinned(b.id);
+    
+    if (aPinned && !bPinned) return -1;
+    if (!aPinned && bPinned) return 1;
+    
+    // If both pinned or both not pinned, sort by date (newest first)
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
+
   arr.forEach((noteData) => {
     const noteItem = document.createElement('note-item');
-    noteItem.note = noteData;
+    // Add pinned property to note data
+    noteItem.note = {
+      ...noteData,
+      pinned: isNotePinned(noteData.id),
+    };
     container.appendChild(noteItem);
   });
 }

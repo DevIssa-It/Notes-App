@@ -28,6 +28,10 @@ template.innerHTML = `
       width:100%;
       cursor:pointer;
     }
+    .note-card.pinned {
+      border-color: #f59e0b;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3), var(--shadow-md);
+    }
     .note-card::before{
       content:'';
       position:absolute;
@@ -38,6 +42,10 @@ template.innerHTML = `
       background:linear-gradient(90deg,#7c3aed,#06b6d4);
       opacity:0;
       transition:opacity 250ms ease;
+    }
+    .note-card.pinned::before{
+      background:linear-gradient(90deg,#f59e0b,#eab308);
+      opacity:1;
     }
     .note-card:hover{
       transform:translateY(-4px);
@@ -146,14 +154,56 @@ template.innerHTML = `
       color:white;
       box-shadow:0 6px 16px rgba(220,38,38,0.4), 0 2px 6px rgba(0,0,0,0.4);
     }
+    .pinBtn{
+      position:absolute;
+      top:12px;
+      right:12px;
+      background: var(--input-bg);
+      border:2px solid var(--card-border);
+      color: var(--text-secondary);
+      padding:6px 10px;
+      border-radius:8px;
+      cursor:pointer;
+      font-size:1rem;
+      transition:all 220ms ease;
+      opacity:0;
+      visibility:hidden;
+    }
+    .note-card:hover .pinBtn{
+      opacity:1;
+      visibility:visible;
+    }
+    .pinBtn.pinned{
+      opacity:1;
+      visibility:visible;
+      background:#f59e0b;
+      border-color:#eab308;
+      color:white;
+    }
+    .pinBtn:hover{
+      transform:scale(1.1) rotate(15deg);
+    }
+    .copyBtn:hover{
+      background:#06b6d4;
+      border-color:#0891b2;
+      color:white;
+      box-shadow:0 6px 16px rgba(6,182,212,0.4), 0 2px 6px rgba(0,0,0,0.4);
+    }
     .archived{opacity:0.6}
   </style>
   <article class="note-card">
+    <button class="pinBtn" title="Pin note">
+      <i class="fas fa-thumbtack"></i>
+    </button>
     <div class="title"></div>
     <div class="body"></div>
     <div class="meta">
       <div class="created"></div>
       <div class="btns">
+        <button class="btn copyBtn" title="Copy to clipboard">
+          <i class="fas fa-copy"></i>
+          <span class="btn-text">Copy</span>
+        </button>
         <button class="btn archiveBtn" title="Archive">
           <i class="fas fa-archive"></i>
           <span class="btn-text">Archive</span>
@@ -169,7 +219,7 @@ template.innerHTML = `
 
 class NoteItem extends HTMLElement {
   static get observedAttributes() {
-    return ['data-id', 'archived', 'created-at'];
+    return ['data-id', 'archived', 'created-at', 'pinned'];
   }
 
   constructor() {
@@ -181,9 +231,13 @@ class NoteItem extends HTMLElement {
     this.createdEl = this.shadowRoot.querySelector('.created');
     this.archiveBtn = this.shadowRoot.querySelector('.archiveBtn');
     this.deleteBtn = this.shadowRoot.querySelector('.deleteBtn');
+    this.pinBtn = this.shadowRoot.querySelector('.pinBtn');
+    this.copyBtn = this.shadowRoot.querySelector('.copyBtn');
 
     this.onArchive = this.onArchive.bind(this);
     this.onDelete = this.onDelete.bind(this);
+    this.onPin = this.onPin.bind(this);
+    this.onCopy = this.onCopy.bind(this);
     this.onKeydown = this.onKeydown.bind(this);
     this.onClick = this.onClick.bind(this);
   }
@@ -191,6 +245,8 @@ class NoteItem extends HTMLElement {
   connectedCallback() {
     this.archiveBtn.addEventListener('click', this.onArchive);
     this.deleteBtn.addEventListener('click', this.onDelete);
+    this.pinBtn.addEventListener('click', this.onPin);
+    this.copyBtn.addEventListener('click', this.onCopy);
     this.addEventListener('keydown', this.onKeydown);
     
     // Add click listener to the card itself
@@ -210,6 +266,8 @@ class NoteItem extends HTMLElement {
   disconnectedCallback() {
     this.archiveBtn.removeEventListener('click', this.onArchive);
     this.deleteBtn.removeEventListener('click', this.onDelete);
+    this.pinBtn.removeEventListener('click', this.onPin);
+    this.copyBtn.removeEventListener('click', this.onCopy);
     this.removeEventListener('keydown', this.onKeydown);
     
     const card = this.shadowRoot.querySelector('.note-card');
@@ -234,6 +292,12 @@ class NoteItem extends HTMLElement {
       this.removeAttribute('archived');
     }
     
+    if (noteData.pinned) {
+      this.setAttribute('pinned', 'true');
+    } else {
+      this.removeAttribute('pinned');
+    }
+    
     // Use dataset to store title and body to avoid conflicts
     this.dataset.noteTitle = noteData.title || '';
     this.dataset.noteBody = noteData.body || '';
@@ -252,6 +316,7 @@ class NoteItem extends HTMLElement {
       body: this.dataset.noteBody || '',
       createdAt: this.getAttribute('created-at'),
       archived: this.hasAttribute('archived'),
+      pinned: this.hasAttribute('pinned'),
     };
   }
 
@@ -288,6 +353,46 @@ class NoteItem extends HTMLElement {
         composed: true,
       })
     );
+  }
+
+  onPin(e) {
+    e.stopPropagation(); // Prevent card click event
+    
+    const isPinned = this.hasAttribute('pinned');
+    const eventName = isPinned ? 'note-unpin' : 'note-pin';
+    
+    this.dispatchEvent(
+      new CustomEvent(eventName, {
+        detail: { id: this.getAttribute('data-id') },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
+  async onCopy(e) {
+    e.stopPropagation(); // Prevent card click event
+    
+    const n = this.note;
+    const text = `${n.title}\n\n${n.body}`;
+    
+    try {
+      await navigator.clipboard.writeText(text);
+      
+      // Show feedback
+      const btnText = this.copyBtn.querySelector('.btn-text');
+      const btnIcon = this.copyBtn.querySelector('i');
+      if (btnText) btnText.textContent = 'Copied!';
+      if (btnIcon) btnIcon.className = 'fas fa-check';
+      
+      // Reset after 2 seconds
+      setTimeout(() => {
+        if (btnText) btnText.textContent = 'Copy';
+        if (btnIcon) btnIcon.className = 'fas fa-copy';
+      }, 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
   }
 
   onClick(e) {
@@ -339,15 +444,27 @@ class NoteItem extends HTMLElement {
       this.createdEl.title = new Date(createdAt).toLocaleString();
     }
     
+    // Update pinned state
+    const card = this.shadowRoot.querySelector('article');
+    if (this.hasAttribute('pinned')) {
+      card.classList.add('pinned');
+      this.pinBtn.classList.add('pinned');
+      this.pinBtn.title = 'Unpin note';
+    } else {
+      card.classList.remove('pinned');
+      this.pinBtn.classList.remove('pinned');
+      this.pinBtn.title = 'Pin note';
+    }
+    
     // Update archived state and button label
     const btnText = this.archiveBtn.querySelector('.btn-text');
     const btnIcon = this.archiveBtn.querySelector('i');
     if (this.hasAttribute('archived')) {
-      this.shadowRoot.querySelector('article').classList.add('archived');
+      card.classList.add('archived');
       if (btnText) btnText.textContent = 'Unarchive';
       if (btnIcon) btnIcon.className = 'fas fa-box-open';
     } else {
-      this.shadowRoot.querySelector('article').classList.remove('archived');
+      card.classList.remove('archived');
       if (btnText) btnText.textContent = 'Archive';
       if (btnIcon) btnIcon.className = 'fas fa-archive';
     }

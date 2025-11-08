@@ -42,6 +42,8 @@ import {
   handleDeleteNote,
   handleArchiveNote,
   handleUnarchiveNote,
+  handlePinNote,
+  handleUnpinNote,
 } from './handlers/note-handlers.js';
 
 import {
@@ -231,6 +233,15 @@ async function mount() {
 
   document.body.addEventListener('note-unarchive', async (e) => {
     await handleUnarchiveNote(e.detail.id, refreshViews);
+  });
+
+  // Note item pin/unpin
+  document.body.addEventListener('note-pin', (e) => {
+    handlePinNote(e.detail.id, refreshViews);
+  });
+
+  document.body.addEventListener('note-unpin', (e) => {
+    handleUnpinNote(e.detail.id, refreshViews);
   });
 
   // Note item delete

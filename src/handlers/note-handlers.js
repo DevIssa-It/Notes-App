@@ -198,3 +198,65 @@ export async function handleUnarchiveNote(id, onSuccess) {
     loadingManager.hide();
   }
 }
+
+/**
+ * Get pinned notes from localStorage
+ * @returns {Set<string>} Set of pinned note IDs
+ */
+function getPinnedNotes() {
+  try {
+    const pinned = localStorage.getItem('pinnedNotes');
+    return pinned ? new Set(JSON.parse(pinned)) : new Set();
+  } catch (error) {
+    console.error('Failed to load pinned notes:', error);
+    return new Set();
+  }
+}
+
+/**
+ * Save pinned notes to localStorage
+ * @param {Set<string>} pinnedSet - Set of pinned note IDs
+ */
+function savePinnedNotes(pinnedSet) {
+  try {
+    localStorage.setItem('pinnedNotes', JSON.stringify([...pinnedSet]));
+  } catch (error) {
+    console.error('Failed to save pinned notes:', error);
+  }
+}
+
+/**
+ * Check if a note is pinned
+ * @param {string} id - Note ID
+ * @returns {boolean} True if pinned
+ */
+export function isNotePinned(id) {
+  const pinned = getPinnedNotes();
+  return pinned.has(id);
+}
+
+/**
+ * Handle note pinning
+ * @param {string} id - Note ID
+ * @param {Function} onSuccess - Success callback
+ */
+export function handlePinNote(id, onSuccess) {
+  const pinned = getPinnedNotes();
+  pinned.add(id);
+  savePinnedNotes(pinned);
+  showSuccess('📌 Note pinned to top');
+  if (onSuccess) onSuccess();
+}
+
+/**
+ * Handle note unpinning
+ * @param {string} id - Note ID
+ * @param {Function} onSuccess - Success callback
+ */
+export function handleUnpinNote(id, onSuccess) {
+  const pinned = getPinnedNotes();
+  pinned.delete(id);
+  savePinnedNotes(pinned);
+  showSuccess('Note unpinned');
+  if (onSuccess) onSuccess();
+}
