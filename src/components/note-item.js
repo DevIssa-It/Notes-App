@@ -156,6 +156,7 @@ template.innerHTML = `
       display:flex;
       gap:8px;
       align-items:center;
+      position:relative;
     }
     .quick-actions{
       display:flex;
@@ -254,79 +255,89 @@ template.innerHTML = `
       background:rgba(255, 255, 255, 0.1);
     }
     .pinBtn{
-      background: transparent;
-      border:none;
-      color: #78716c;
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      color: #f59e0b;
       padding:6px;
-      border-radius:6px;
+      border-radius:8px;
       cursor:pointer;
       font-size:1.1rem;
       transition:all 250ms cubic-bezier(0.4, 0, 0.2, 1);
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      width:32px;
-      height:32px;
+      width:36px;
+      height:36px;
     }
     .pinBtn i{
       pointer-events:none;
     }
     .pinBtn:hover{
-      background:rgba(245, 158, 11, 0.1);
+      background:rgba(245, 158, 11, 0.15);
+      border-color: #f59e0b;
       color:#f59e0b;
       transform:scale(1.1);
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
     }
     .pinBtn.pinned{
       color:#f59e0b;
-      background:rgba(245, 158, 11, 0.15);
+      background:rgba(245, 158, 11, 0.2);
+      border-color: #f59e0b;
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
     }
     .favoriteBtn{
-      background: transparent;
-      border:none;
-      color: #78716c;
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: #ef4444;
       padding:6px;
-      border-radius:6px;
+      border-radius:8px;
       cursor:pointer;
       font-size:1.1rem;
       transition:all 250ms cubic-bezier(0.4, 0, 0.2, 1);
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      width:32px;
-      height:32px;
+      width:36px;
+      height:36px;
     }
     .favoriteBtn i{
       pointer-events:none;
     }
     .favoriteBtn:hover{
-      background:rgba(239, 68, 68, 0.1);
+      background:rgba(239, 68, 68, 0.15);
+      border-color: #ef4444;
       color:#ef4444;
       transform:scale(1.1);
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
     }
     .favoriteBtn.favorited{
       color:#ef4444;
-      background:rgba(239, 68, 68, 0.15);
+      background:rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
     }
     .moreBtn{
-      background: transparent;
-      border:none;
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
       color: var(--text-secondary);
       padding:6px;
-      border-radius:6px;
+      border-radius:8px;
       cursor:pointer;
       font-size:1.2rem;
       transition:all 250ms cubic-bezier(0.4, 0, 0.2, 1);
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      width:32px;
-      height:32px;
+      width:36px;
+      height:36px;
       position:relative;
     }
     .moreBtn:hover{
-      background:var(--input-bg);
-      color:var(--accent);
+      background:var(--accent);
+      border-color: var(--accent);
+      color:#fff;
       transform:rotate(90deg);
+      box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
     }
     .dropdown-menu{
       position:absolute;
