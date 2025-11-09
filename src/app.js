@@ -52,11 +52,13 @@ import {
 import {
   handleRestoreAll,
   handleDeleteAll,
-  handleExportNotes,
 } from './handlers/bulk-handlers.js';
 
+import {
+  handleExportNotes as exportNotes,
+} from './handlers/export-import-handlers.js';
+
 // Import utilities
-import { MESSAGES } from './constants.js';
 import { showError, showConfirm } from './ui-helpers.js';
 
 /**
@@ -292,11 +294,51 @@ async function mount() {
   }
 
   // Export notes
-  document.body.addEventListener('export-notes', handleExportNotes);
+  document.body.addEventListener('export-notes', exportNotes);
 
-  // Import notes (not available in API mode)
-  document.body.addEventListener('import-notes', () => {
-    showError(MESSAGES.ERROR.IMPORT_NOT_AVAILABLE);
+  // Import notes
+  document.body.addEventListener('import-notes', async (e) => {
+    if (e.detail && e.detail.data) {
+      const importData = e.detail.data;
+      
+      // Validate and show confirmation
+      const confirmed = await showConfirm(
+        'Import Notes',
+        `This will import ${importData.metadata?.totalNotes || 0} notes. Continue?`,
+        'Yes, import'
+      );
+      
+      if (confirmed) {
+        try {
+          // Import active notes
+          const activePromises = importData.notes.active.map((note) =>
+            handleCreateNote({ title: note.title, body: note.body }, () => {})
+          );
+          
+          await Promise.all(activePromises);
+          
+          // Import archived notes
+          const archivedResults = await Promise.all(
+            importData.notes.archived.map((note) =>
+              handleCreateNote({ title: note.title, body: note.body }, () => {})
+            )
+          );
+          
+          // Archive imported notes
+          const archivePromises = archivedResults
+            .filter((created) => created && created.id)
+            .map((created) => handleArchiveNote(created.id, () => {}));
+          
+          await Promise.all(archivePromises);
+          
+          // Refresh views after import
+          await loadNotesFromAPI();
+          refreshViews();
+        } catch (error) {
+          showError('Import failed', error);
+        }
+      }
+    }
   });
 
   document.body.addEventListener('import-error', (e) => {
