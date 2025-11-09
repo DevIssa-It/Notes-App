@@ -131,36 +131,42 @@ template.innerHTML = `
       justify-content:space-between;
       align-items:center;
       margin-top:auto;
-      gap:12px;
+      gap:8px;
       padding-top:12px;
       border-top:1px solid rgba(124, 58, 237, 0.08);
+      flex-wrap:wrap;
     }
     .created{
-      font-size:0.8rem;
+      font-size:0.75rem;
       color: var(--muted);
       white-space:nowrap;
       background: linear-gradient(135deg, rgba(124, 58, 237, 0.08), rgba(6, 182, 212, 0.08));
-      padding: 6px 12px;
-      border-radius: 8px;
+      padding: 5px 10px;
+      border-radius: 6px;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       border: 1px solid rgba(124, 58, 237, 0.1);
       flex-shrink:0;
+      max-width: 140px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .created::before{
       content: '🕐';
-      font-size: 0.9rem;
+      font-size: 0.85rem;
+      flex-shrink: 0;
     }
     .btns{
       display:flex;
-      gap:8px;
+      gap:6px;
       align-items:center;
       position:relative;
+      flex-shrink:0;
     }
     .quick-actions{
       display:flex;
-      gap:6px;
+      gap:4px;
       align-items:center;
     }
     .btn{
@@ -258,7 +264,7 @@ template.innerHTML = `
       background: rgba(245, 158, 11, 0.08);
       border: 1px solid rgba(245, 158, 11, 0.2);
       color: #f59e0b;
-      padding:6px;
+      padding:4px;
       border-radius:8px;
       cursor:pointer;
       font-size:1.3rem;
@@ -266,8 +272,8 @@ template.innerHTML = `
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      width:36px;
-      height:36px;
+      width:32px;
+      height:32px;
       position:relative;
     }
     .pinBtn i,
@@ -276,8 +282,9 @@ template.innerHTML = `
       display:none;
     }
     .btn-emoji{
-      font-size:1.1rem;
+      font-size:1rem;
       pointer-events:none;
+      line-height:1;
     }
     .pinBtn::after{
       content: attr(data-tooltip);
@@ -337,7 +344,7 @@ template.innerHTML = `
       background: rgba(239, 68, 68, 0.08);
       border: 1px solid rgba(239, 68, 68, 0.2);
       color: #ef4444;
-      padding:6px;
+      padding:4px;
       border-radius:8px;
       cursor:pointer;
       font-size:1.3rem;
@@ -345,8 +352,8 @@ template.innerHTML = `
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      width:36px;
-      height:36px;
+      width:32px;
+      height:32px;
       position:relative;
     }
     .favoriteBtn::after{
@@ -407,7 +414,7 @@ template.innerHTML = `
       background: var(--input-bg);
       border: 1px solid var(--card-border);
       color: var(--text-secondary);
-      padding:6px;
+      padding:4px;
       border-radius:8px;
       cursor:pointer;
       font-size:1.3rem;
@@ -415,8 +422,8 @@ template.innerHTML = `
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      width:36px;
-      height:36px;
+      width:32px;
+      height:32px;
       position:relative;
     }
     .moreBtn::after{
@@ -466,15 +473,15 @@ template.innerHTML = `
     }
     .dropdown-menu{
       position:absolute;
-      bottom:40px;
+      bottom:36px;
       right:0;
       background:var(--card);
       border:2px solid var(--card-border);
       border-radius:12px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
       padding:6px;
-      min-width:150px;
-      max-width:200px;
+      min-width:140px;
+      max-width:180px;
       opacity:0;
       visibility:hidden;
       transform:translateY(10px) scale(0.95);
@@ -491,15 +498,15 @@ template.innerHTML = `
       background:transparent;
       border:none;
       color:var(--text-primary);
-      padding:10px 14px;
+      padding:8px 12px;
       border-radius:8px;
       cursor:pointer;
-      font-size:0.9rem;
+      font-size:0.85rem;
       font-weight:500;
       transition:all 200ms ease;
       display:flex;
       align-items:center;
-      gap:10px;
+      gap:8px;
       width:100%;
       text-align:left;
     }
@@ -507,9 +514,11 @@ template.innerHTML = `
       display:none;
     }
     .item-emoji{
-      font-size:1.1rem;
-      width:20px;
+      font-size:1rem;
+      width:18px;
       text-align:center;
+      flex-shrink:0;
+      line-height:1;
     }
     .dropdown-item:hover{
       background:var(--input-bg);
