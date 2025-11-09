@@ -82,11 +82,27 @@ export function renderNotes(container, notes) {
     arr = arr.filter((n) => n.archived);
   }
 
+  // Show search results count if searching
+  if (currentSearchQuery && arr.length > 0) {
+    const searchInfo = document.createElement('div');
+    searchInfo.className = 'search-results-info';
+    searchInfo.innerHTML = `
+      <i class="fas fa-search"></i>
+      <span>Found <strong>${arr.length}</strong> note${arr.length > 1 ? 's' : ''} matching "<strong>${currentSearchQuery}</strong>"</span>
+    `;
+    container.appendChild(searchInfo);
+  }
+
   if (arr.length === 0) {
+    const emptyMessage = currentSearchQuery 
+      ? `No notes found matching "${currentSearchQuery}"`
+      : 'No notes found';
+    
     container.innerHTML = `
       <div style="text-align:center; padding:2rem; color: var(--text-secondary);">
-        <i class="fas fa-inbox" style="font-size:3rem; margin-bottom:1rem;"></i>
-        <p>No notes found</p>
+        <i class="fas fa-${currentSearchQuery ? 'search' : 'inbox'}" style="font-size:3rem; margin-bottom:1rem;"></i>
+        <p>${emptyMessage}</p>
+        ${currentSearchQuery ? '<p style="font-size:0.9rem; margin-top:0.5rem;">Try different keywords or clear the search</p>' : ''}
       </div>
     `;
     return;
@@ -128,6 +144,12 @@ export function renderNotes(container, notes) {
       pinned: isNotePinned(noteData.id),
       favorited: isNoteFavorited(noteData.id),
     };
+    
+    // Pass search query for highlighting
+    if (currentSearchQuery) {
+      noteItem.setAttribute('search-query', currentSearchQuery);
+    }
+    
     container.appendChild(noteItem);
   });
 }
