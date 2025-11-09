@@ -84,7 +84,6 @@ template.innerHTML = `
       position:relative;
       padding-bottom:8px;
       margin-bottom:4px;
-      padding-right:100px;
     }
     .title::after{
       content:'';
@@ -255,15 +254,15 @@ template.innerHTML = `
     .pinBtn{
       position:absolute;
       top:14px;
-      right:14px;
+      left:14px;
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(10px);
       border:2px solid rgba(245, 158, 11, 0.3);
       color: #78716c;
-      padding:6px 12px;
-      border-radius:8px;
+      padding:6px 10px;
+      border-radius:20px;
       cursor:pointer;
-      font-size:0.82rem;
+      font-size:0.8rem;
       font-weight:600;
       transition:all 250ms cubic-bezier(0.4, 0, 0.2, 1);
       opacity:0;
@@ -276,11 +275,12 @@ template.innerHTML = `
       pointer-events:auto;
     }
     .pinBtn i{
-      font-size:0.9rem;
+      font-size:0.85rem;
       pointer-events:none;
     }
     .pinBtn span{
       pointer-events:none;
+      font-size:0.75rem;
     }
     .note-card:hover .pinBtn{
       opacity:1;
@@ -306,15 +306,15 @@ template.innerHTML = `
     .favoriteBtn{
       position:absolute;
       top:14px;
-      right:90px;
+      left:90px;
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(10px);
       border:2px solid rgba(239, 68, 68, 0.3);
       color: #78716c;
-      padding:6px 12px;
-      border-radius:8px;
+      padding:6px 10px;
+      border-radius:20px;
       cursor:pointer;
-      font-size:0.82rem;
+      font-size:0.8rem;
       font-weight:600;
       transition:all 250ms cubic-bezier(0.4, 0, 0.2, 1);
       opacity:0;
@@ -327,11 +327,12 @@ template.innerHTML = `
       pointer-events:auto;
     }
     .favoriteBtn i{
-      font-size:0.9rem;
+      font-size:0.85rem;
       pointer-events:none;
     }
     .favoriteBtn span{
       pointer-events:none;
+      font-size:0.75rem;
     }
     .note-card:hover .favoriteBtn{
       opacity:1;
