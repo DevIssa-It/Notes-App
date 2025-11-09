@@ -675,13 +675,27 @@ class NoteItem extends HTMLElement {
     
     // Render created date with relative time
     const createdAt = n.createdAt || this.getAttribute('created-at');
-    this.createdEl.textContent = createdAt
-      ? formatRelativeTime(createdAt)
-      : '';
+    const { lastModified } = n;
     
-    // Add tooltip with full date
-    if (createdAt) {
-      this.createdEl.title = new Date(createdAt).toLocaleString();
+    // Show "Edited" text if note was modified
+    if (lastModified && lastModified !== createdAt) {
+      this.createdEl.innerHTML = `
+        <span style="color: var(--text-secondary);">Created ${formatRelativeTime(createdAt)}</span>
+        <br>
+        <span style="color: var(--accent); font-weight: 600;">
+          <i class="fas fa-edit" style="font-size: 0.85em;"></i>
+          Edited ${formatRelativeTime(lastModified)}
+        </span>
+      `;
+      this.createdEl.title = `Created: ${new Date(createdAt).toLocaleString()}\nLast edited: ${new Date(lastModified).toLocaleString()}`;
+    } else {
+      this.createdEl.textContent = createdAt
+        ? formatRelativeTime(createdAt)
+        : '';
+      // Add tooltip with full date
+      if (createdAt) {
+        this.createdEl.title = new Date(createdAt).toLocaleString();
+      }
     }
     
     // Update pinned state

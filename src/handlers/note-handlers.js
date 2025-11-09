@@ -82,6 +82,9 @@ export async function handleUpdateNote(id, updates, onSuccess) {
     
     // Add updated note to correct store based on archived status
     // The note from API already has the correct archived property
+    // Add lastModified timestamp
+    updatedNote.lastModified = new Date().toISOString();
+    
     if (updatedNote.archived) {
       // For archived notes, we need to add to active store first, then move to archived
       addNote(updatedNote);

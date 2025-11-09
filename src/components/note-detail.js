@@ -292,6 +292,13 @@ class NoteDetail extends HTMLElement {
               <i class="fas fa-clock"></i>
               ${formatRelativeTime(this._note.createdAt)}
             </div>
+            ${this._note.lastModified && this._note.lastModified !== this._note.createdAt
+    ? `<div class="meta-item" style="color: var(--accent); font-weight: 600;">
+                  <i class="fas fa-edit"></i>
+                  Last edited: ${formatRelativeTime(this._note.lastModified)}
+                </div>`
+    : ''
+}
             <div class="meta-item">
               <i class="fas fa-id-badge"></i>
               ID: ${this._note.id}
