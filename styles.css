@@ -834,6 +834,29 @@ textarea:focus-visible {
   box-shadow: var(--shadow-sm);
 }
 
+/* Search highlight styles */
+.search-highlight {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #1f2937;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(251, 191, 36, 0.3);
+  animation: highlightPulse 0.5s ease-out;
+}
+
+@keyframes highlightPulse {
+  0% {
+    background-color: rgba(251, 191, 36, 0.3);
+  }
+  50% {
+    background-color: rgba(251, 191, 36, 0.8);
+  }
+  100% {
+    background-color: rgba(251, 191, 36, 1);
+  }
+}
+
 .note-form input[type='text']:focus,
 .note-form textarea:focus {
   outline: none;

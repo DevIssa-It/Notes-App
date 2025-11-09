@@ -645,12 +645,33 @@ class NoteItem extends HTMLElement {
     }
   }
 
+  highlightText(text, query) {
+    if (!query || !text) {
+      return this.escapeHtml(text);
+    }
+    
+    // Escape special regex characters in query
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escapedQuery})`, 'gi');
+    
+    // Escape HTML to prevent XSS, then add highlight
+    const escapedText = this.escapeHtml(text);
+    return escapedText.replace(regex, '<mark class="search-highlight">$1</mark>');
+  }
+
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
   render() {
     const n = this.note;
+    const searchQuery = this.getAttribute('search-query') || '';
     
-    // Render title and body from cached data
-    this.titleEl.textContent = n.title || '';
-    this.bodyEl.textContent = n.body || '';
+    // Render title and body with search highlighting
+    this.titleEl.innerHTML = this.highlightText(n.title || '', searchQuery);
+    this.bodyEl.innerHTML = this.highlightText(n.body || '', searchQuery);
     
     // Render created date with relative time
     const createdAt = n.createdAt || this.getAttribute('created-at');
