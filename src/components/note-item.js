@@ -84,6 +84,7 @@ template.innerHTML = `
       position:relative;
       padding-bottom:8px;
       margin-bottom:4px;
+      padding-right:180px;
     }
     .title::after{
       content:'';
