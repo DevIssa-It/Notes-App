@@ -261,7 +261,7 @@ template.innerHTML = `
       padding:6px;
       border-radius:8px;
       cursor:pointer;
-      font-size:1.1rem;
+      font-size:1.3rem;
       transition:all 250ms cubic-bezier(0.4, 0, 0.2, 1);
       display:inline-flex;
       align-items:center;
@@ -270,7 +270,13 @@ template.innerHTML = `
       height:36px;
       position:relative;
     }
-    .pinBtn i{
+    .pinBtn i,
+    .favoriteBtn i,
+    .moreBtn i{
+      display:none;
+    }
+    .btn-emoji{
+      font-size:1.1rem;
       pointer-events:none;
     }
     .pinBtn::after{
@@ -334,7 +340,7 @@ template.innerHTML = `
       padding:6px;
       border-radius:8px;
       cursor:pointer;
-      font-size:1.1rem;
+      font-size:1.3rem;
       transition:all 250ms cubic-bezier(0.4, 0, 0.2, 1);
       display:inline-flex;
       align-items:center;
@@ -342,9 +348,6 @@ template.innerHTML = `
       width:36px;
       height:36px;
       position:relative;
-    }
-    .favoriteBtn i{
-      pointer-events:none;
     }
     .favoriteBtn::after{
       content: attr(data-tooltip);
@@ -407,7 +410,7 @@ template.innerHTML = `
       padding:6px;
       border-radius:8px;
       cursor:pointer;
-      font-size:1.2rem;
+      font-size:1.3rem;
       transition:all 250ms cubic-bezier(0.4, 0, 0.2, 1);
       display:inline-flex;
       align-items:center;
@@ -470,12 +473,13 @@ template.innerHTML = `
       border-radius:12px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
       padding:6px;
-      min-width:160px;
+      min-width:150px;
+      max-width:200px;
       opacity:0;
       visibility:hidden;
       transform:translateY(10px) scale(0.95);
       transition:all 250ms cubic-bezier(0.4, 0, 0.2, 1);
-      z-index:100;
+      z-index:1000;
       backdrop-filter:blur(10px);
     }
     .dropdown-menu.show{
@@ -500,8 +504,12 @@ template.innerHTML = `
       text-align:left;
     }
     .dropdown-item i{
-      font-size:0.95rem;
-      width:18px;
+      display:none;
+    }
+    .item-emoji{
+      font-size:1.1rem;
+      width:20px;
+      text-align:center;
     }
     .dropdown-item:hover{
       background:var(--input-bg);
@@ -547,25 +555,28 @@ template.innerHTML = `
         <div class="quick-actions">
           <button class="favoriteBtn" data-tooltip="Add to favorites">
             <i class="fas fa-heart"></i>
+            <span class="btn-emoji">❤️</span>
           </button>
           <button class="pinBtn" data-tooltip="Pin to top">
             <i class="fas fa-map-pin"></i>
+            <span class="btn-emoji">📌</span>
           </button>
         </div>
         <button class="moreBtn">
           <i class="fas fa-ellipsis-v"></i>
+          <span class="btn-emoji">⋮</span>
         </button>
         <div class="dropdown-menu">
           <button class="dropdown-item copy">
-            <i class="fas fa-copy"></i>
+            <span class="item-emoji">📋</span>
             <span>Copy note</span>
           </button>
           <button class="dropdown-item archive">
-            <i class="fas fa-archive"></i>
+            <span class="item-emoji">📦</span>
             <span>Archive</span>
           </button>
           <button class="dropdown-item delete">
-            <i class="fas fa-trash"></i>
+            <span class="item-emoji">🗑️</span>
             <span>Delete</span>
           </button>
         </div>
@@ -789,15 +800,15 @@ class NoteItem extends HTMLElement {
       await navigator.clipboard.writeText(text);
       
       // Show feedback
-      const btnText = this.copyBtn.querySelector('span');
-      const btnIcon = this.copyBtn.querySelector('i');
+      const btnText = this.copyBtn.querySelector('span:last-child');
+      const btnEmoji = this.copyBtn.querySelector('.item-emoji');
       if (btnText) btnText.textContent = 'Copied!';
-      if (btnIcon) btnIcon.className = 'fas fa-check';
+      if (btnEmoji) btnEmoji.textContent = '✅';
       
       // Close dropdown and reset after 2 seconds
       setTimeout(() => {
-        if (btnText) btnText.textContent = 'Copy';
-        if (btnIcon) btnIcon.className = 'fas fa-copy';
+        if (btnText) btnText.textContent = 'Copy note';
+        if (btnEmoji) btnEmoji.textContent = '📋';
         this.dropdownMenu.classList.remove('show');
       }, 2000);
     } catch (err) {
@@ -911,16 +922,16 @@ class NoteItem extends HTMLElement {
     }
     
     // Update archived state and button label
-    const btnText = this.archiveBtn.querySelector('span');
-    const btnIcon = this.archiveBtn.querySelector('i');
+    const btnText = this.archiveBtn.querySelector('span:last-child');
+    const btnEmoji = this.archiveBtn.querySelector('.item-emoji');
     if (this.hasAttribute('archived')) {
       card.classList.add('archived');
       if (btnText) btnText.textContent = 'Restore note';
-      if (btnIcon) btnIcon.className = 'fas fa-box-open';
+      if (btnEmoji) btnEmoji.textContent = '📤';
     } else {
       card.classList.remove('archived');
       if (btnText) btnText.textContent = 'Archive note';
-      if (btnIcon) btnIcon.className = 'fas fa-archive';
+      if (btnEmoji) btnEmoji.textContent = '📦';
     }
 
     // Update accessible label on host
