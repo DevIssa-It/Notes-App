@@ -82,7 +82,7 @@ export function renderNotes(container, notes) {
     arr = arr.filter((n) => n.archived);
   }
 
-  // Show search results count if searching
+  // Show search results count if searching - at the top before notes
   if (currentSearchQuery && arr.length > 0) {
     const searchInfo = document.createElement('div');
     searchInfo.className = 'search-results-info';
@@ -98,6 +98,10 @@ export function renderNotes(container, notes) {
       ? `No notes found matching "${currentSearchQuery}"`
       : 'No notes found';
     
+    // Clear the search info if exists
+    const searchInfo = container.querySelector('.search-results-info');
+    if (searchInfo) searchInfo.remove();
+    
     container.innerHTML = `
       <div style="text-align:center; padding:2rem; color: var(--text-secondary);">
         <i class="fas fa-${currentSearchQuery ? 'search' : 'inbox'}" style="font-size:3rem; margin-bottom:1rem;"></i>
@@ -107,6 +111,10 @@ export function renderNotes(container, notes) {
     `;
     return;
   }
+
+  // Create notes grid container
+  const notesGrid = document.createElement('div');
+  notesGrid.className = 'notes-grid';
 
   // Sort notes: pinned notes first, then by creation date
   arr.sort((a, b) => {
@@ -150,8 +158,11 @@ export function renderNotes(container, notes) {
       noteItem.setAttribute('search-query', currentSearchQuery);
     }
     
-    container.appendChild(noteItem);
+    notesGrid.appendChild(noteItem);
   });
+
+  // Append the notes grid to container
+  container.appendChild(notesGrid);
 }
 
 /**
