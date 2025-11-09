@@ -135,6 +135,7 @@ template.innerHTML = `
       flex-wrap:wrap;
       padding-top:8px;
       border-top:1px solid rgba(124, 58, 237, 0.08);
+      flex-direction: row-reverse;
     }
     .created{
       font-size:0.8rem;
@@ -252,56 +253,58 @@ template.innerHTML = `
       background:rgba(255, 255, 255, 0.1);
     }
     .pinBtn{
-      position:absolute;
-      top:14px;
-      left:14px;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(234, 179, 8, 0.05));
       border:2px solid rgba(245, 158, 11, 0.3);
-      color: #78716c;
-      padding:6px 10px;
-      border-radius:20px;
+      color: #f59e0b;
+      padding:8px 14px;
+      border-radius:10px;
       cursor:pointer;
-      font-size:0.8rem;
+      font-size:0.85rem;
       font-weight:600;
       transition:all 250ms cubic-bezier(0.4, 0, 0.2, 1);
-      opacity:0;
-      visibility:hidden;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      display:flex;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      position:relative;
+      overflow:hidden;
+      white-space:nowrap;
+      display:inline-flex;
       align-items:center;
-      gap:5px;
-      z-index:10;
-      pointer-events:auto;
+      gap:6px;
+      flex-shrink:0;
     }
     .pinBtn i{
-      font-size:0.85rem;
+      font-size:0.8rem;
       pointer-events:none;
     }
     .pinBtn span{
       pointer-events:none;
-      font-size:0.75rem;
+      font-size:0.82rem;
     }
-    .note-card:hover .pinBtn{
-      opacity:1;
-      visibility:visible;
+    .pinBtn::before{
+      content:'';
+      position:absolute;
+      top:50%;
+      left:50%;
+      width:0;
+      height:0;
+      border-radius:50%;
+      background:rgba(245, 158, 11, 0.1);
+      transform:translate(-50%, -50%);
+      transition:width 400ms ease, height 400ms ease;
     }
-    .pinBtn.pinned{
-      opacity:1;
-      visibility:visible;
-      background:linear-gradient(135deg, #f59e0b, #eab308);
-      border-color:transparent;
-      color:white;
-      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+    .pinBtn:hover::before{
+      width:300px;
+      height:300px;
     }
     .pinBtn:hover{
       transform:translateY(-2px);
-      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.5);
-      background:linear-gradient(135deg, #fbbf24, #f59e0b);
-      border-color:#f59e0b;
+      background:linear-gradient(135deg, #f59e0b, #eab308);
+      border-color:transparent;
+      color:white;
+      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4);
     }
-    .pinBtn.pinned:hover{
-      background:linear-gradient(135deg, #fbbf24, #f59e0b);
+    .pinBtn:active{
+      transform:translateY(0);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
     .favoriteBtn{
       position:absolute;
@@ -380,19 +383,18 @@ template.innerHTML = `
     .archived{opacity:0.6}
   </style>
   <article class="note-card">
-    <button class="favoriteBtn" title="Add to favorites">
-      <i class="fas fa-heart"></i>
-      <span>Favorit</span>
-    </button>
-    <button class="pinBtn" title="Pin note">
-      <i class="fas fa-map-pin"></i>
-      <span>Pin</span>
-    </button>
     <div class="title"></div>
     <div class="body"></div>
     <div class="meta">
-      <div class="created"></div>
       <div class="btns">
+        <button class="favoriteBtn" title="Add to favorites">
+          <i class="fas fa-heart"></i>
+          <span>Favorit</span>
+        </button>
+        <button class="pinBtn" title="Pin note">
+          <i class="fas fa-map-pin"></i>
+          <span>Pin</span>
+        </button>
         <button class="btn copyBtn" title="Copy to clipboard">
           <i class="fas fa-copy"></i>
           <span class="btn-text">Copy</span>
@@ -406,6 +408,7 @@ template.innerHTML = `
           <span class="btn-text">Delete</span>
         </button>
       </div>
+      <div class="created"></div>
     </div>
   </article>
 `;
