@@ -433,20 +433,6 @@ note-input {
   font-weight: 700;
 }
 
-/* Notes grid container */
-.notes-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-  width: 100%;
-}
-
-@media (max-width: 640px) {
-  .notes-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 @keyframes slideDown {
   from {
     opacity: 0;

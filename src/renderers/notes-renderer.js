@@ -60,11 +60,22 @@ export function getCurrentFilter() {
 
 /**
  * Render notes to container
- * @param {HTMLElement} container - Container element
+ * @param {HTMLElement} container - Container element (note-list)
  * @param {Array} notes - Array of notes
  */
 export function renderNotes(container, notes) {
+  // Clear container first
   container.innerHTML = '';
+  
+  // Get parent container to add search banner outside of grid
+  const parentContainer = container.parentElement;
+  
+  // Remove any existing search banner
+  const existingBanner = parentContainer?.querySelector('.search-results-info');
+  if (existingBanner) {
+    existingBanner.remove();
+  }
+  
   let arr = [...notes];
 
   // Filter by search query
@@ -82,25 +93,22 @@ export function renderNotes(container, notes) {
     arr = arr.filter((n) => n.archived);
   }
 
-  // Show search results count if searching - at the top before notes
-  if (currentSearchQuery && arr.length > 0) {
+  // Show search results count if searching - insert BEFORE the note-list container
+  if (currentSearchQuery && arr.length > 0 && parentContainer) {
     const searchInfo = document.createElement('div');
     searchInfo.className = 'search-results-info';
     searchInfo.innerHTML = `
       <i class="fas fa-search"></i>
       <span>Found <strong>${arr.length}</strong> note${arr.length > 1 ? 's' : ''} matching "<strong>${currentSearchQuery}</strong>"</span>
     `;
-    container.appendChild(searchInfo);
+    // Insert before the note-list element
+    parentContainer.insertBefore(searchInfo, container);
   }
 
   if (arr.length === 0) {
     const emptyMessage = currentSearchQuery 
       ? `No notes found matching "${currentSearchQuery}"`
       : 'No notes found';
-    
-    // Clear the search info if exists
-    const searchInfo = container.querySelector('.search-results-info');
-    if (searchInfo) searchInfo.remove();
     
     container.innerHTML = `
       <div style="text-align:center; padding:2rem; color: var(--text-secondary);">
@@ -111,10 +119,6 @@ export function renderNotes(container, notes) {
     `;
     return;
   }
-
-  // Create notes grid container
-  const notesGrid = document.createElement('div');
-  notesGrid.className = 'notes-grid';
 
   // Sort notes: pinned notes first, then by creation date
   arr.sort((a, b) => {
@@ -158,11 +162,9 @@ export function renderNotes(container, notes) {
       noteItem.setAttribute('search-query', currentSearchQuery);
     }
     
-    notesGrid.appendChild(noteItem);
+    // Append directly to container (note-list has grid layout)
+    container.appendChild(noteItem);
   });
-
-  // Append the notes grid to container
-  container.appendChild(notesGrid);
 }
 
 /**
