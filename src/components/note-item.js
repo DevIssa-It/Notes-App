@@ -129,13 +129,11 @@ template.innerHTML = `
     .meta{
       display:flex;
       justify-content:space-between;
-      align-items:flex-end;
+      align-items:center;
       margin-top:auto;
       gap:12px;
-      flex-wrap:wrap;
-      padding-top:8px;
+      padding-top:12px;
       border-top:1px solid rgba(124, 58, 237, 0.08);
-      flex-direction: row-reverse;
     }
     .created{
       font-size:0.8rem;
@@ -156,9 +154,12 @@ template.innerHTML = `
     }
     .btns{
       display:flex;
+      gap:8px;
+      align-items:center;
+    }
+    .quick-actions{
+      display:flex;
       gap:6px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
       align-items:center;
     }
     .btn{
@@ -253,117 +254,139 @@ template.innerHTML = `
       background:rgba(255, 255, 255, 0.1);
     }
     .pinBtn{
-      background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(234, 179, 8, 0.05));
-      border:2px solid rgba(245, 158, 11, 0.3);
-      color: #f59e0b;
-      padding:8px 14px;
-      border-radius:10px;
+      background: transparent;
+      border:none;
+      color: #78716c;
+      padding:6px;
+      border-radius:6px;
       cursor:pointer;
-      font-size:0.85rem;
-      font-weight:600;
+      font-size:1.1rem;
       transition:all 250ms cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-      position:relative;
-      overflow:hidden;
-      white-space:nowrap;
       display:inline-flex;
       align-items:center;
-      gap:6px;
-      flex-shrink:0;
+      justify-content:center;
+      width:32px;
+      height:32px;
     }
     .pinBtn i{
-      font-size:0.8rem;
       pointer-events:none;
-    }
-    .pinBtn span{
-      pointer-events:none;
-      font-size:0.82rem;
-    }
-    .pinBtn::before{
-      content:'';
-      position:absolute;
-      top:50%;
-      left:50%;
-      width:0;
-      height:0;
-      border-radius:50%;
-      background:rgba(245, 158, 11, 0.1);
-      transform:translate(-50%, -50%);
-      transition:width 400ms ease, height 400ms ease;
-    }
-    .pinBtn:hover::before{
-      width:300px;
-      height:300px;
     }
     .pinBtn:hover{
-      transform:translateY(-2px);
-      background:linear-gradient(135deg, #f59e0b, #eab308);
-      border-color:transparent;
-      color:white;
-      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4);
+      background:rgba(245, 158, 11, 0.1);
+      color:#f59e0b;
+      transform:scale(1.1);
     }
-    .pinBtn:active{
-      transform:translateY(0);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    .pinBtn.pinned{
+      color:#f59e0b;
+      background:rgba(245, 158, 11, 0.15);
     }
     .favoriteBtn{
-      position:absolute;
-      top:14px;
-      left:90px;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border:2px solid rgba(239, 68, 68, 0.3);
+      background: transparent;
+      border:none;
       color: #78716c;
-      padding:6px 10px;
-      border-radius:20px;
+      padding:6px;
+      border-radius:6px;
       cursor:pointer;
-      font-size:0.8rem;
-      font-weight:600;
+      font-size:1.1rem;
       transition:all 250ms cubic-bezier(0.4, 0, 0.2, 1);
-      opacity:0;
-      visibility:hidden;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      display:flex;
+      display:inline-flex;
       align-items:center;
-      gap:5px;
-      z-index:10;
-      pointer-events:auto;
+      justify-content:center;
+      width:32px;
+      height:32px;
     }
     .favoriteBtn i{
-      font-size:0.85rem;
       pointer-events:none;
-    }
-    .favoriteBtn span{
-      pointer-events:none;
-      font-size:0.75rem;
-    }
-    .note-card:hover .favoriteBtn{
-      opacity:1;
-      visibility:visible;
-    }
-    .favoriteBtn.favorited{
-      opacity:1;
-      visibility:visible;
-      background:linear-gradient(135deg, #ef4444, #dc2626);
-      border-color:transparent;
-      color:white;
-      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
     }
     .favoriteBtn:hover{
-      transform:scale(1.15);
-      box-shadow: 0 4px 16px rgba(239, 68, 68, 0.5);
+      background:rgba(239, 68, 68, 0.1);
+      color:#ef4444;
+      transform:scale(1.1);
     }
-    .favoriteBtn:hover.favorited{
-      animation: heartbeat 0.6s ease-in-out;
+    .favoriteBtn.favorited{
+      color:#ef4444;
+      background:rgba(239, 68, 68, 0.15);
     }
-    @keyframes heartbeat {
-      0%, 100% { transform: scale(1.15); }
-      25% { transform: scale(1.3); }
-      50% { transform: scale(1.15); }
-      75% { transform: scale(1.25); }
+    .moreBtn{
+      background: transparent;
+      border:none;
+      color: var(--text-secondary);
+      padding:6px;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:1.2rem;
+      transition:all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:32px;
+      height:32px;
+      position:relative;
+    }
+    .moreBtn:hover{
+      background:var(--input-bg);
+      color:var(--accent);
+      transform:rotate(90deg);
+    }
+    .dropdown-menu{
+      position:absolute;
+      bottom:40px;
+      right:0;
+      background:var(--card);
+      border:2px solid var(--card-border);
+      border-radius:12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      padding:6px;
+      min-width:160px;
+      opacity:0;
+      visibility:hidden;
+      transform:translateY(10px) scale(0.95);
+      transition:all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+      z-index:100;
+      backdrop-filter:blur(10px);
+    }
+    .dropdown-menu.show{
+      opacity:1;
+      visibility:visible;
+      transform:translateY(0) scale(1);
+    }
+    .dropdown-item{
+      background:transparent;
+      border:none;
+      color:var(--text-primary);
+      padding:10px 14px;
+      border-radius:8px;
+      cursor:pointer;
+      font-size:0.9rem;
+      font-weight:500;
+      transition:all 200ms ease;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      width:100%;
+      text-align:left;
+    }
+    .dropdown-item i{
+      font-size:0.95rem;
+      width:18px;
+    }
+    .dropdown-item:hover{
+      background:var(--input-bg);
+    }
+    .dropdown-item.copy:hover{
+      background:rgba(6, 182, 212, 0.1);
+      color:#06b6d4;
+    }
+    .dropdown-item.archive:hover{
+      background:rgba(124, 58, 237, 0.1);
+      color:var(--accent);
+    }
+    .dropdown-item.delete:hover{
+      background:rgba(220, 38, 38, 0.1);
+      color:#dc2626;
     }
     
-    /* Responsive: hide button text on small cards */
+    /* Responsive */
     @media (max-width: 480px) {
       .btn-text{
         display:none;
@@ -386,29 +409,34 @@ template.innerHTML = `
     <div class="title"></div>
     <div class="body"></div>
     <div class="meta">
-      <div class="btns">
-        <button class="favoriteBtn" title="Add to favorites">
-          <i class="fas fa-heart"></i>
-          <span>Favorit</span>
-        </button>
-        <button class="pinBtn" title="Pin note">
-          <i class="fas fa-map-pin"></i>
-          <span>Pin</span>
-        </button>
-        <button class="btn copyBtn" title="Copy to clipboard">
-          <i class="fas fa-copy"></i>
-          <span class="btn-text">Copy</span>
-        </button>
-        <button class="btn archiveBtn" title="Archive">
-          <i class="fas fa-archive"></i>
-          <span class="btn-text">Archive</span>
-        </button>
-        <button class="btn deleteBtn" title="Delete">
-          <i class="fas fa-trash"></i>
-          <span class="btn-text">Delete</span>
-        </button>
-      </div>
       <div class="created"></div>
+      <div class="btns">
+        <div class="quick-actions">
+          <button class="favoriteBtn" title="Add to favorites">
+            <i class="fas fa-heart"></i>
+          </button>
+          <button class="pinBtn" title="Pin note">
+            <i class="fas fa-map-pin"></i>
+          </button>
+        </div>
+        <button class="moreBtn" title="More actions">
+          <i class="fas fa-ellipsis-v"></i>
+        </button>
+        <div class="dropdown-menu">
+          <button class="dropdown-item copy">
+            <i class="fas fa-copy"></i>
+            <span>Copy</span>
+          </button>
+          <button class="dropdown-item archive">
+            <i class="fas fa-archive"></i>
+            <span>Archive</span>
+          </button>
+          <button class="dropdown-item delete">
+            <i class="fas fa-trash"></i>
+            <span>Delete</span>
+          </button>
+        </div>
+      </div>
     </div>
   </article>
 `;
@@ -425,11 +453,13 @@ class NoteItem extends HTMLElement {
     this.titleEl = this.shadowRoot.querySelector('.title');
     this.bodyEl = this.shadowRoot.querySelector('.body');
     this.createdEl = this.shadowRoot.querySelector('.created');
-    this.archiveBtn = this.shadowRoot.querySelector('.archiveBtn');
-    this.deleteBtn = this.shadowRoot.querySelector('.deleteBtn');
     this.pinBtn = this.shadowRoot.querySelector('.pinBtn');
     this.favoriteBtn = this.shadowRoot.querySelector('.favoriteBtn');
-    this.copyBtn = this.shadowRoot.querySelector('.copyBtn');
+    this.moreBtn = this.shadowRoot.querySelector('.moreBtn');
+    this.dropdownMenu = this.shadowRoot.querySelector('.dropdown-menu');
+    this.archiveBtn = this.shadowRoot.querySelector('.dropdown-item.archive');
+    this.deleteBtn = this.shadowRoot.querySelector('.dropdown-item.delete');
+    this.copyBtn = this.shadowRoot.querySelector('.dropdown-item.copy');
 
     this.onArchive = this.onArchive.bind(this);
     this.onDelete = this.onDelete.bind(this);
@@ -438,6 +468,8 @@ class NoteItem extends HTMLElement {
     this.onCopy = this.onCopy.bind(this);
     this.onKeydown = this.onKeydown.bind(this);
     this.onClick = this.onClick.bind(this);
+    this.toggleDropdown = this.toggleDropdown.bind(this);
+    this.closeDropdown = this.closeDropdown.bind(this);
   }
 
   connectedCallback() {
@@ -446,6 +478,7 @@ class NoteItem extends HTMLElement {
     this.pinBtn.addEventListener('click', this.onPin);
     this.favoriteBtn.addEventListener('click', this.onFavorite);
     this.copyBtn.addEventListener('click', this.onCopy);
+    this.moreBtn.addEventListener('click', this.toggleDropdown);
     this.addEventListener('keydown', this.onKeydown);
     
     // Add click listener to the card itself
@@ -453,6 +486,9 @@ class NoteItem extends HTMLElement {
     if (card) {
       card.addEventListener('click', this.onClick);
     }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', this.closeDropdown);
     
     this.render();
 
@@ -468,7 +504,9 @@ class NoteItem extends HTMLElement {
     this.pinBtn.removeEventListener('click', this.onPin);
     this.favoriteBtn.removeEventListener('click', this.onFavorite);
     this.copyBtn.removeEventListener('click', this.onCopy);
+    this.moreBtn.removeEventListener('click', this.toggleDropdown);
     this.removeEventListener('keydown', this.onKeydown);
+    document.removeEventListener('click', this.closeDropdown);
     
     const card = this.shadowRoot.querySelector('.note-card');
     if (card) {
@@ -533,6 +571,20 @@ class NoteItem extends HTMLElement {
 
   get data() {
     return this.note;
+  }
+
+  toggleDropdown(e) {
+    e.stopPropagation(); // Prevent card click event
+    e.preventDefault();
+    
+    this.dropdownMenu.classList.toggle('show');
+  }
+
+  closeDropdown(e) {
+    // Close dropdown if clicking outside
+    if (!this.contains(e.target)) {
+      this.dropdownMenu.classList.remove('show');
+    }
   }
 
   onArchive(e) {
@@ -604,15 +656,16 @@ class NoteItem extends HTMLElement {
       await navigator.clipboard.writeText(text);
       
       // Show feedback
-      const btnText = this.copyBtn.querySelector('.btn-text');
+      const btnText = this.copyBtn.querySelector('span');
       const btnIcon = this.copyBtn.querySelector('i');
       if (btnText) btnText.textContent = 'Copied!';
       if (btnIcon) btnIcon.className = 'fas fa-check';
       
-      // Reset after 2 seconds
+      // Close dropdown and reset after 2 seconds
       setTimeout(() => {
         if (btnText) btnText.textContent = 'Copy';
         if (btnIcon) btnIcon.className = 'fas fa-copy';
+        this.dropdownMenu.classList.remove('show');
       }, 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
