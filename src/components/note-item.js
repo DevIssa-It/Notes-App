@@ -268,9 +268,48 @@ template.innerHTML = `
       justify-content:center;
       width:36px;
       height:36px;
+      position:relative;
     }
     .pinBtn i{
       pointer-events:none;
+    }
+    .pinBtn::after{
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background: rgba(0, 0, 0, 0.9);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 200ms ease;
+      pointer-events: none;
+      z-index: 1000;
+    }
+    .pinBtn::before{
+      content: '';
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      border: 5px solid transparent;
+      border-top-color: rgba(0, 0, 0, 0.9);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 200ms ease;
+      pointer-events: none;
+      z-index: 1000;
+    }
+    .pinBtn:hover::after,
+    .pinBtn:hover::before{
+      opacity: 1;
+      visibility: visible;
     }
     .pinBtn:hover{
       background:rgba(245, 158, 11, 0.15);
@@ -284,6 +323,9 @@ template.innerHTML = `
       background:rgba(245, 158, 11, 0.2);
       border-color: #f59e0b;
       box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+    }
+    .pinBtn.pinned::after{
+      content: 'Unpin note';
     }
     .favoriteBtn{
       background: rgba(239, 68, 68, 0.08);
@@ -299,9 +341,48 @@ template.innerHTML = `
       justify-content:center;
       width:36px;
       height:36px;
+      position:relative;
     }
     .favoriteBtn i{
       pointer-events:none;
+    }
+    .favoriteBtn::after{
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background: rgba(0, 0, 0, 0.9);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 200ms ease;
+      pointer-events: none;
+      z-index: 1000;
+    }
+    .favoriteBtn::before{
+      content: '';
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      border: 5px solid transparent;
+      border-top-color: rgba(0, 0, 0, 0.9);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 200ms ease;
+      pointer-events: none;
+      z-index: 1000;
+    }
+    .favoriteBtn:hover::after,
+    .favoriteBtn:hover::before{
+      opacity: 1;
+      visibility: visible;
     }
     .favoriteBtn:hover{
       background:rgba(239, 68, 68, 0.15);
@@ -315,6 +396,9 @@ template.innerHTML = `
       background:rgba(239, 68, 68, 0.2);
       border-color: #ef4444;
       box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    }
+    .favoriteBtn.favorited::after{
+      content: 'Remove from favorites';
     }
     .moreBtn{
       background: var(--input-bg);
@@ -331,6 +415,44 @@ template.innerHTML = `
       width:36px;
       height:36px;
       position:relative;
+    }
+    .moreBtn::after{
+      content: 'More actions';
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background: rgba(0, 0, 0, 0.9);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 200ms ease;
+      pointer-events: none;
+      z-index: 1000;
+    }
+    .moreBtn::before{
+      content: '';
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      border: 5px solid transparent;
+      border-top-color: rgba(0, 0, 0, 0.9);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 200ms ease;
+      pointer-events: none;
+      z-index: 1000;
+    }
+    .moreBtn:hover::after,
+    .moreBtn:hover::before{
+      opacity: 1;
+      visibility: visible;
     }
     .moreBtn:hover{
       background:var(--accent);
@@ -423,20 +545,20 @@ template.innerHTML = `
       <div class="created"></div>
       <div class="btns">
         <div class="quick-actions">
-          <button class="favoriteBtn" title="Add to favorites">
+          <button class="favoriteBtn" data-tooltip="Add to favorites">
             <i class="fas fa-heart"></i>
           </button>
-          <button class="pinBtn" title="Pin note">
+          <button class="pinBtn" data-tooltip="Pin to top">
             <i class="fas fa-map-pin"></i>
           </button>
         </div>
-        <button class="moreBtn" title="More actions">
+        <button class="moreBtn">
           <i class="fas fa-ellipsis-v"></i>
         </button>
         <div class="dropdown-menu">
           <button class="dropdown-item copy">
             <i class="fas fa-copy"></i>
-            <span>Copy</span>
+            <span>Copy note</span>
           </button>
           <button class="dropdown-item archive">
             <i class="fas fa-archive"></i>
@@ -772,32 +894,32 @@ class NoteItem extends HTMLElement {
     if (this.hasAttribute('pinned')) {
       card.classList.add('pinned');
       this.pinBtn.classList.add('pinned');
-      this.pinBtn.title = 'Unpin note';
+      this.pinBtn.setAttribute('data-tooltip', 'Unpin from top');
     } else {
       card.classList.remove('pinned');
       this.pinBtn.classList.remove('pinned');
-      this.pinBtn.title = 'Pin note';
+      this.pinBtn.setAttribute('data-tooltip', 'Pin to top');
     }
     
     // Update favorited state
     if (this.hasAttribute('favorited')) {
       this.favoriteBtn.classList.add('favorited');
-      this.favoriteBtn.title = 'Remove from favorites';
+      this.favoriteBtn.setAttribute('data-tooltip', 'Remove from favorites');
     } else {
       this.favoriteBtn.classList.remove('favorited');
-      this.favoriteBtn.title = 'Add to favorites';
+      this.favoriteBtn.setAttribute('data-tooltip', 'Add to favorites');
     }
     
     // Update archived state and button label
-    const btnText = this.archiveBtn.querySelector('.btn-text');
+    const btnText = this.archiveBtn.querySelector('span');
     const btnIcon = this.archiveBtn.querySelector('i');
     if (this.hasAttribute('archived')) {
       card.classList.add('archived');
-      if (btnText) btnText.textContent = 'Unarchive';
+      if (btnText) btnText.textContent = 'Restore note';
       if (btnIcon) btnIcon.className = 'fas fa-box-open';
     } else {
       card.classList.remove('archived');
-      if (btnText) btnText.textContent = 'Archive';
+      if (btnText) btnText.textContent = 'Archive note';
       if (btnIcon) btnIcon.className = 'fas fa-archive';
     }
 
