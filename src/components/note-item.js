@@ -29,6 +29,62 @@ template.innerHTML = `
       cursor:pointer;
       backdrop-filter: blur(10px);
     }
+    .note-card.selected {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.12), var(--card-gradient));
+      transform: scale(0.98);
+    }
+    .select-checkbox {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 200ms ease;
+      z-index: 10;
+    }
+    :host([selection-mode]) .select-checkbox,
+    .note-card.selected .select-checkbox {
+      opacity: 1;
+    }
+    .select-checkbox input {
+      display: none;
+    }
+    .checkmark {
+      display: block;
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--accent);
+      border-radius: 6px;
+      background: var(--card);
+      position: relative;
+      transition: all 200ms ease;
+    }
+    .select-checkbox:hover .checkmark {
+      transform: scale(1.1);
+      border-color: var(--accent-2);
+    }
+    .select-checkbox input:checked ~ .checkmark {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .checkmark::after {
+      content: '';
+      position: absolute;
+      display: none;
+      left: 7px;
+      top: 3px;
+      width: 6px;
+      height: 11px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+    .select-checkbox input:checked ~ .checkmark::after {
+      display: block;
+    }
     .note-card.pinned {
       border-color: #f59e0b;
       background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), var(--card-gradient));
@@ -556,6 +612,10 @@ template.innerHTML = `
     .archived{opacity:0.6}
   </style>
   <article class="note-card">
+    <label class="select-checkbox">
+      <input type="checkbox" class="checkbox-input">
+      <span class="checkmark"></span>
+    </label>
     <div class="title"></div>
     <div class="body"></div>
     <div class="meta">
@@ -613,6 +673,8 @@ class NoteItem extends HTMLElement {
     this.archiveBtn = this.shadowRoot.querySelector('.dropdown-item.archive');
     this.deleteBtn = this.shadowRoot.querySelector('.dropdown-item.delete');
     this.copyBtn = this.shadowRoot.querySelector('.dropdown-item.copy');
+    this.checkbox = this.shadowRoot.querySelector('.checkbox-input');
+    this.card = this.shadowRoot.querySelector('.note-card');
 
     this.onArchive = this.onArchive.bind(this);
     this.onDelete = this.onDelete.bind(this);
@@ -623,6 +685,7 @@ class NoteItem extends HTMLElement {
     this.onClick = this.onClick.bind(this);
     this.toggleDropdown = this.toggleDropdown.bind(this);
     this.closeDropdown = this.closeDropdown.bind(this);
+    this.onCheckboxChange = this.onCheckboxChange.bind(this);
   }
 
   connectedCallback() {
@@ -632,12 +695,12 @@ class NoteItem extends HTMLElement {
     this.favoriteBtn.addEventListener('click', this.onFavorite);
     this.copyBtn.addEventListener('click', this.onCopy);
     this.moreBtn.addEventListener('click', this.toggleDropdown);
+    this.checkbox.addEventListener('change', this.onCheckboxChange);
     this.addEventListener('keydown', this.onKeydown);
     
     // Add click listener to the card itself
-    const card = this.shadowRoot.querySelector('.note-card');
-    if (card) {
-      card.addEventListener('click', this.onClick);
+    if (this.card) {
+      this.card.addEventListener('click', this.onClick);
     }
     
     // Close dropdown when clicking outside
@@ -738,6 +801,28 @@ class NoteItem extends HTMLElement {
     if (!this.contains(e.target)) {
       this.dropdownMenu.classList.remove('show');
     }
+  }
+
+  onCheckboxChange(e) {
+    e.stopPropagation();
+    const isChecked = this.checkbox.checked;
+    
+    if (isChecked) {
+      this.card.classList.add('selected');
+    } else {
+      this.card.classList.remove('selected');
+    }
+    
+    this.dispatchEvent(
+      new CustomEvent('note-selection-changed', {
+        detail: { 
+          id: this.getAttribute('data-id'),
+          selected: isChecked
+        },
+        bubbles: true,
+        composed: true,
+      })
+    );
   }
 
   onArchive(e) {

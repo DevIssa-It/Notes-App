@@ -14,6 +14,7 @@ import './components/note-edit-modal.js';
 import './components/theme-toggle.js';
 import './components/note-stats.js';
 import './components/keyboard-shortcuts.js';
+import './components/bulk-actions-bar.js';
 
 // Import state management
 import {
@@ -277,6 +278,84 @@ async function mount() {
 
     if (confirmed) {
       await handleDeleteNote(e.detail.id, refreshViews);
+    }
+  });
+
+  // === BULK SELECTION & ACTIONS ===
+  const bulkBar = document.querySelector('bulk-actions-bar');
+  const selectedNotes = new Set();
+
+  // Handle note selection changes
+  document.body.addEventListener('note-selection-changed', (e) => {
+    if (e.detail.selected) {
+      selectedNotes.add(e.detail.id);
+    } else {
+      selectedNotes.delete(e.detail.id);
+    }
+    
+    if (bulkBar) {
+      bulkBar.setSelectedIds(Array.from(selectedNotes));
+    }
+    
+    // Enable selection mode on all note items
+    if (selectedNotes.size > 0) {
+      document.querySelectorAll('note-item').forEach(item => {
+        item.setAttribute('selection-mode', '');
+      });
+    } else {
+      document.querySelectorAll('note-item').forEach(item => {
+        item.removeAttribute('selection-mode');
+      });
+    }
+  });
+
+  // Handle clear selection from bulk bar
+  document.body.addEventListener('clear-selection', () => {
+    selectedNotes.clear();
+    document.querySelectorAll('note-item').forEach(item => {
+      item.removeAttribute('selection-mode');
+      const checkbox = item.shadowRoot.querySelector('.checkbox-input');
+      if (checkbox) checkbox.checked = false;
+      const card = item.shadowRoot.querySelector('.note-card');
+      if (card) card.classList.remove('selected');
+    });
+  });
+
+  // Handle bulk archive
+  document.body.addEventListener('bulk-archive', async (e) => {
+    const { ids } = e.detail;
+    if (ids.length === 0) return;
+    
+    const confirmed = await showConfirm(
+      'Archive Multiple Notes',
+      `Archive ${ids.length} note(s)?`,
+      'Yes, archive'
+    );
+    
+    if (confirmed) {
+      await Promise.all(ids.map(id => handleArchiveNote(id, () => {})));
+      selectedNotes.clear();
+      if (bulkBar) bulkBar.clearSelection();
+      refreshViews();
+    }
+  });
+
+  // Handle bulk delete
+  document.body.addEventListener('bulk-delete', async (e) => {
+    const { ids } = e.detail;
+    if (ids.length === 0) return;
+    
+    const confirmed = await showConfirm(
+      'Delete Multiple Notes',
+      `Permanently delete ${ids.length} note(s)? This cannot be undone!`,
+      'Yes, delete all'
+    );
+    
+    if (confirmed) {
+      await Promise.all(ids.map(id => handleDeleteNote(id, () => {})));
+      selectedNotes.clear();
+      if (bulkBar) bulkBar.clearSelection();
+      refreshViews();
     }
   });
 
