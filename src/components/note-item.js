@@ -129,6 +129,37 @@ template.innerHTML = `
     .note-card:hover::after{
       opacity:1;
     }
+    
+    /* Quick Preview Tooltip */
+    .note-card::before {
+      content: attr(data-preview);
+      position: absolute;
+      bottom: -60px;
+      left: 50%;
+      transform: translateX(-50%) scale(0.9);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.98));
+      color: #e6eef8;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: none;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid rgba(124, 58, 237, 0.3);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+      z-index: 100;
+    }
+    
+    .note-card:hover::before {
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+      bottom: -70px;
+    }
+    
     .title{
       font-weight:700;
       font-size:1.1rem;
@@ -1008,6 +1039,12 @@ class NoteItem extends HTMLElement {
     // Render title and body with search highlighting
     this.titleEl.innerHTML = this.highlightText(n.title || '', searchQuery);
     this.bodyEl.innerHTML = this.highlightText(n.body || '', searchQuery);
+    
+    // Add preview tooltip
+    const preview = `📝 ${n.title.substring(0, 30)}${n.title.length > 30 ? '...' : ''}`;
+    if (this.card) {
+      this.card.setAttribute('data-preview', preview);
+    }
     
     // Render created date with relative time
     const createdAt = n.createdAt || this.getAttribute('created-at');
