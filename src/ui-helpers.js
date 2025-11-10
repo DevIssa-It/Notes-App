@@ -101,6 +101,18 @@ export async function showConfirm(title, text, confirmText = 'Yes') {
     confirmButtonText: confirmText,
     background: theme.background,
     color: theme.color,
+    customClass: {
+      popup: 'swal-popup-enhanced',
+      confirmButton: 'swal-confirm-btn',
+      cancelButton: 'swal-cancel-btn',
+    },
+    buttonsStyling: false,
+    showClass: {
+      popup: 'swal-show-animation',
+    },
+    hideClass: {
+      popup: 'swal-hide-animation',
+    },
   });
   return result.isConfirmed;
 }

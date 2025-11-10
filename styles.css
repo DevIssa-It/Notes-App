@@ -910,3 +910,76 @@ textarea:focus-visible {
   justify-content: center;
   margin: 16px 0;
 }
+
+/* Enhanced SweetAlert2 Styles */
+.swal-popup-enhanced {
+  border-radius: 20px !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
+  border: 2px solid rgba(124, 58, 237, 0.3) !important;
+  padding: 32px !important;
+}
+
+.swal-confirm-btn {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 12px 32px !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4) !important;
+}
+
+.swal-confirm-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6) !important;
+}
+
+.swal-cancel-btn {
+  background: rgba(100, 116, 139, 0.2) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid rgba(148, 163, 184, 0.3) !important;
+  border-radius: 12px !important;
+  padding: 12px 32px !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+}
+
+.swal-cancel-btn:hover {
+  background: rgba(100, 116, 139, 0.3) !important;
+  border-color: rgba(148, 163, 184, 0.5) !important;
+}
+
+.swal-show-animation {
+  animation: swalFadeIn 0.3s ease !important;
+}
+
+.swal-hide-animation {
+  animation: swalFadeOut 0.2s ease !important;
+}
+
+@keyframes swalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes swalFadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
