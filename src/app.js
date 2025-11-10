@@ -18,6 +18,7 @@ import './components/bulk-actions-bar.js';
 import './components/toast-notification.js';
 import './components/stats-badge.js';
 import './components/shortcuts-modal.js';
+import './components/note-skeleton.js';
 
 // Import state management
 import {
