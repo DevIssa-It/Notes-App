@@ -640,6 +640,10 @@ template.innerHTML = `
             <span class="item-emoji">📋</span>
             <span>Copy note</span>
           </button>
+          <button class="dropdown-item export">
+            <span class="item-emoji">💾</span>
+            <span>Export</span>
+          </button>
           <button class="dropdown-item archive">
             <span class="item-emoji">📦</span>
             <span>Archive</span>
@@ -673,6 +677,7 @@ class NoteItem extends HTMLElement {
     this.archiveBtn = this.shadowRoot.querySelector('.dropdown-item.archive');
     this.deleteBtn = this.shadowRoot.querySelector('.dropdown-item.delete');
     this.copyBtn = this.shadowRoot.querySelector('.dropdown-item.copy');
+    this.exportBtn = this.shadowRoot.querySelector('.dropdown-item.export');
     this.checkbox = this.shadowRoot.querySelector('.checkbox-input');
     this.card = this.shadowRoot.querySelector('.note-card');
 
@@ -681,6 +686,7 @@ class NoteItem extends HTMLElement {
     this.onPin = this.onPin.bind(this);
     this.onFavorite = this.onFavorite.bind(this);
     this.onCopy = this.onCopy.bind(this);
+    this.onExport = this.onExport.bind(this);
     this.onKeydown = this.onKeydown.bind(this);
     this.onClick = this.onClick.bind(this);
     this.toggleDropdown = this.toggleDropdown.bind(this);
@@ -694,6 +700,7 @@ class NoteItem extends HTMLElement {
     this.pinBtn.addEventListener('click', this.onPin);
     this.favoriteBtn.addEventListener('click', this.onFavorite);
     this.copyBtn.addEventListener('click', this.onCopy);
+    this.exportBtn.addEventListener('click', this.onExport);
     this.moreBtn.addEventListener('click', this.toggleDropdown);
     this.checkbox.addEventListener('change', this.onCheckboxChange);
     this.addEventListener('keydown', this.onKeydown);
@@ -903,11 +910,44 @@ class NoteItem extends HTMLElement {
       setTimeout(() => {
         if (btnText) btnText.textContent = 'Copy note';
         if (btnEmoji) btnEmoji.textContent = '📋';
-        this.dropdownMenu.classList.remove('show');
+        this.closeDropdown();
       }, 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
     }
+  }
+
+  onExport(e) {
+    e.stopPropagation(); // Prevent card click event
+    
+    const n = this.note;
+    const content = `${n.title}\n\n${n.body}\n\n---\nCreated: ${new Date(n.createdAt).toLocaleString()}`;
+    
+    // Create blob and download link
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    // Sanitize filename
+    const filename = n.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    a.download = `${filename}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    // Show feedback
+    const btnText = this.exportBtn.querySelector('span:last-child');
+    const btnEmoji = this.exportBtn.querySelector('.item-emoji');
+    if (btnText) btnText.textContent = 'Exported!';
+    if (btnEmoji) btnEmoji.textContent = '✅';
+    
+    // Close dropdown and reset after 2 seconds
+    setTimeout(() => {
+      if (btnText) btnText.textContent = 'Export';
+      if (btnEmoji) btnEmoji.textContent = '💾';
+      this.closeDropdown();
+    }, 2000);
   }
 
   onClick(e) {
