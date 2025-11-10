@@ -192,11 +192,32 @@ function setFilter(filter) {
   const notesGrid = document.getElementById('notesGrid');
   renderNotes(notesGrid, getActiveNotes());
 
-  // Update filter buttons
+  // Update filter buttons with counts
+  const stats = getStats();
   document.querySelectorAll('.filter-btn').forEach((b) => {
     const isActive = b.dataset.filter === filter;
     b.classList.toggle('active', isActive);
     b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    
+    // Add count badges
+    const filterType = b.dataset.filter;
+    let count = 0;
+    if (filterType === 'all') count = stats.activeCount;
+    else if (filterType === 'archived') count = stats.archivedCount;
+    else if (filterType === 'pinned') count = stats.pinnedCount;
+    else if (filterType === 'favorite') count = stats.favoriteCount;
+    
+    // Remove existing badge
+    const existingBadge = b.querySelector('.filter-badge');
+    if (existingBadge) existingBadge.remove();
+    
+    // Add new badge
+    if (count > 0) {
+      const badge = document.createElement('span');
+      badge.className = 'filter-badge';
+      badge.textContent = count;
+      b.appendChild(badge);
+    }
   });
 }
 
@@ -469,11 +490,7 @@ async function mount() {
   });
 
   // Initialize filter buttons state
-  document.querySelectorAll('.filter-btn').forEach((b) => {
-    const isActive = b.dataset.filter === getCurrentFilter();
-    b.classList.toggle('active', isActive);
-    b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-  });
+  setFilter(getCurrentFilter());
 
   // Warn before leaving with unsaved changes
   window.addEventListener('beforeunload', (e) => {
