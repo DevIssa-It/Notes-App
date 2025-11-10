@@ -16,6 +16,7 @@ import './components/note-stats.js';
 import './components/keyboard-shortcuts.js';
 import './components/bulk-actions-bar.js';
 import './components/toast-notification.js';
+import './components/stats-badge.js';
 
 // Import state management
 import {
@@ -90,6 +91,12 @@ function refreshViews() {
   const stats = getStats();
   updateArchivedCount(stats.archivedCount);
   updateStats(stats);
+  
+  // Update stats badge
+  const statsBadge = document.querySelector('stats-badge');
+  if (statsBadge) {
+    statsBadge.updateStats(stats.activeCount, stats.archivedCount);
+  }
 }
 
 /**
