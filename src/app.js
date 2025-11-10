@@ -15,6 +15,7 @@ import './components/theme-toggle.js';
 import './components/note-stats.js';
 import './components/keyboard-shortcuts.js';
 import './components/bulk-actions-bar.js';
+import './components/toast-notification.js';
 
 // Import state management
 import {
@@ -61,6 +62,20 @@ import {
 
 // Import utilities
 import { showError, showConfirm } from './ui-helpers.js';
+
+/**
+ * Show toast notification
+ * @param {string} type - Type of toast (success, error, warning, info)
+ * @param {string} title - Toast title
+ * @param {string} message - Toast message
+ * @param {number} duration - Auto-close duration in ms (0 = no auto-close)
+ */
+function showToast(type, title, message, duration = 3000) {
+  const toast = document.querySelector('toast-notification');
+  if (toast) {
+    toast.show({ type, title, message, duration });
+  }
+}
 
 /**
  * Refresh all views
@@ -210,13 +225,17 @@ async function mount() {
 
   // Note creation
   document.body.addEventListener('note-added', async (e) => {
-    await handleCreateNote(e.detail, refreshViews);
+    await handleCreateNote(e.detail, () => {
+      showToast('success', 'Note Created', 'Your note has been saved successfully', 3000);
+      refreshViews();
+    });
   });
 
   // Note editing
   if (editModal) {
     editModal.addEventListener('save', async (e) => {
       await handleUpdateNote(e.detail.id, e.detail, (updatedNote) => {
+        showToast('success', 'Note Updated', 'Changes saved successfully', 3000);
         refreshViews();
         // Use the new note ID since we delete old and create new
         if (updatedNote && updatedNote.id) {
@@ -243,11 +262,17 @@ async function mount() {
 
   // Note item archive/unarchive
   document.body.addEventListener('note-archive', async (e) => {
-    await handleArchiveNote(e.detail.id, refreshViews);
+    await handleArchiveNote(e.detail.id, () => {
+      showToast('success', 'Note Archived', 'Note moved to archive', 3000);
+      refreshViews();
+    });
   });
 
   document.body.addEventListener('note-unarchive', async (e) => {
-    await handleUnarchiveNote(e.detail.id, refreshViews);
+    await handleUnarchiveNote(e.detail.id, () => {
+      showToast('success', 'Note Restored', 'Note moved back to active notes', 3000);
+      refreshViews();
+    });
   });
 
   // Note item pin/unpin
@@ -334,6 +359,7 @@ async function mount() {
     
     if (confirmed) {
       await Promise.all(ids.map(id => handleArchiveNote(id, () => {})));
+      showToast('success', 'Bulk Archive Complete', `${ids.length} note(s) archived successfully`, 3000);
       selectedNotes.clear();
       if (bulkBar) bulkBar.clearSelection();
       refreshViews();
@@ -353,6 +379,7 @@ async function mount() {
     
     if (confirmed) {
       await Promise.all(ids.map(id => handleDeleteNote(id, () => {})));
+      showToast('success', 'Bulk Delete Complete', `${ids.length} note(s) deleted successfully`, 3000);
       selectedNotes.clear();
       if (bulkBar) bulkBar.clearSelection();
       refreshViews();
