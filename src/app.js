@@ -17,6 +17,7 @@ import './components/keyboard-shortcuts.js';
 import './components/bulk-actions-bar.js';
 import './components/toast-notification.js';
 import './components/stats-badge.js';
+import './components/shortcuts-modal.js';
 
 // Import state management
 import {
@@ -479,6 +480,46 @@ async function mount() {
     if (input && input.hasUnsavedChanges && input.hasUnsavedChanges()) {
       e.preventDefault();
       e.returnValue = '';
+    }
+  });
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', (e) => {
+    // Ctrl+K - Show shortcuts modal
+    if (e.ctrlKey && e.key === 'k') {
+      e.preventDefault();
+      const modal = document.querySelector('shortcuts-modal');
+      if (modal) modal.open();
+    }
+
+    // Ctrl+F - Focus search
+    if (e.ctrlKey && e.key === 'f') {
+      e.preventDefault();
+      const searchBar = document.querySelector('search-bar');
+      if (searchBar) {
+        const input = searchBar.shadowRoot.querySelector('.search-input');
+        if (input) input.focus();
+      }
+    }
+
+    // Ctrl+N - Focus new note input
+    if (e.ctrlKey && e.key === 'n') {
+      e.preventDefault();
+      const noteInput = document.querySelector('note-input');
+      if (noteInput) {
+        const titleInput = noteInput.shadowRoot.querySelector('#noteTitle');
+        if (titleInput) titleInput.focus();
+      }
+    }
+
+    // Ctrl+T - Toggle theme
+    if (e.ctrlKey && e.key === 't') {
+      e.preventDefault();
+      const themeToggle = document.querySelector('theme-toggle');
+      if (themeToggle) {
+        const btn = themeToggle.shadowRoot.querySelector('.theme-toggle');
+        if (btn) btn.click();
+      }
     }
   });
 }
