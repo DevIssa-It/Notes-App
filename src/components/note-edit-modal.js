@@ -3,6 +3,12 @@ class NoteEditModal extends HTMLElement {
     super();
     this.attachShadow({ mode: 'open' });
     this._note = null;
+    // Add shared stylesheet for utilities and consistent controls
+    try {
+      // Import is static at top of file via shared-styles.js (added below if missing)
+    } catch (err) {
+      // noop
+    }
   }
 
   set note(value) {

@@ -1,10 +1,19 @@
 import { formatRelativeTime } from '../utils.js';
+import { sharedCss, sharedSheet } from './shared-styles.js';
 
 class NoteDetail extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
     this._note = null;
+    // Apply shared stylesheet if available
+    if (sharedSheet && this.shadowRoot.adoptedStyleSheets !== undefined) {
+      this.shadowRoot.adoptedStyleSheets = [sharedSheet];
+    } else {
+      const s = document.createElement('style');
+      s.textContent = sharedCss;
+      this.shadowRoot.appendChild(s);
+    }
   }
 
   set note(value) {
