@@ -1,13 +1,18 @@
+import { sharedCss, sharedSheet } from './shared-styles.js';
+
 class NoteEditModal extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
     this._note = null;
-    // Add shared stylesheet for utilities and consistent controls
-    try {
-      // Import is static at top of file via shared-styles.js (added below if missing)
-    } catch (err) {
-      // noop
+
+    // Apply shared stylesheet to provide common utilities (buttons, inputs)
+    if (sharedSheet && this.shadowRoot.adoptedStyleSheets !== undefined) {
+      this.shadowRoot.adoptedStyleSheets = [sharedSheet];
+    } else {
+      const s = document.createElement('style');
+      s.textContent = sharedCss;
+      this.shadowRoot.appendChild(s);
     }
   }
 
