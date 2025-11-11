@@ -1,12 +1,22 @@
 /**
- * Stats Badge Component
- * Displays note count statistics with animated counter
+ * Stats Badge Component (uses shared styles)
  */
+
+import { sharedCss, sharedSheet } from './shared-styles.js';
 
 class StatsBadge extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
+
+    // Use constructible stylesheet when available
+    if (sharedSheet && this.shadowRoot.adoptedStyleSheets !== undefined) {
+      this.shadowRoot.adoptedStyleSheets = [sharedSheet];
+    } else {
+      const style = document.createElement('style');
+      style.textContent = sharedCss;
+      this.shadowRoot.appendChild(style);
+    }
   }
 
   connectedCallback() {
@@ -14,76 +24,8 @@ class StatsBadge extends HTMLElement {
   }
 
   render() {
-    this.shadowRoot.innerHTML = `
-      <style>
-        :host {
-          display: inline-block;
-        }
-
-        .stats-container {
-          display: flex;
-          gap: 12px;
-          align-items: center;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          padding: 8px 16px;
-          border-radius: 20px;
-          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .stats-container:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
-        }
-
-        .stat-item {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          color: white;
-          font-size: 14px;
-          font-weight: 600;
-        }
-
-        .stat-icon {
-          font-size: 16px;
-        }
-
-        .stat-count {
-          font-size: 18px;
-          font-weight: 700;
-          min-width: 25px;
-          text-align: center;
-          animation: countPulse 0.3s ease;
-        }
-
-        @keyframes countPulse {
-          0% {
-            transform: scale(1);
-          }
-          50% {
-            transform: scale(1.2);
-          }
-          100% {
-            transform: scale(1);
-          }
-        }
-
-        .stat-label {
-          font-size: 12px;
-          opacity: 0.9;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-        }
-
-        .divider {
-          width: 1px;
-          height: 20px;
-          background: rgba(255, 255, 255, 0.3);
-        }
-      </style>
-
-      <div class="stats-container">
+    this.shadowRoot.innerHTML += `
+      <div class="stats-container" part="stats">
         <div class="stat-item">
           <span class="stat-icon">📝</span>
           <span class="stat-count" id="activeCount">0</span>
