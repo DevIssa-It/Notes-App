@@ -1,20 +1,23 @@
+import { sharedCss, sharedSheet } from './shared-styles.js';
+
 const template = document.createElement('template');
 template.innerHTML = `
-  <style>
-    :host {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 20px;
-      align-items: start;
-    }
-  </style>
-  <slot></slot>
+  <div class="notes-grid"><slot></slot></div>
 `;
 
 class NoteList extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
+    // Apply shared stylesheet if available, otherwise inject as fallback
+    if (sharedSheet && this.shadowRoot.adoptedStyleSheets !== undefined) {
+      this.shadowRoot.adoptedStyleSheets = [sharedSheet];
+    } else {
+      const s = document.createElement('style');
+      s.textContent = sharedCss;
+      this.shadowRoot.appendChild(s);
+    }
+
     this.shadowRoot.appendChild(template.content.cloneNode(true));
   }
 

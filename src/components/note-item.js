@@ -1,4 +1,5 @@
 import { formatRelativeTime } from '../utils.js';
+import { sharedCss, sharedSheet } from './shared-styles.js';
 
 const template = document.createElement('template');
 template.innerHTML = `
@@ -697,6 +698,15 @@ class NoteItem extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
+    // Apply shared stylesheet when possible to reuse common rules
+    if (sharedSheet && this.shadowRoot.adoptedStyleSheets !== undefined) {
+      this.shadowRoot.adoptedStyleSheets = [sharedSheet];
+    } else {
+      const s = document.createElement('style');
+      s.textContent = sharedCss;
+      this.shadowRoot.appendChild(s);
+    }
+
     this.shadowRoot.appendChild(template.content.cloneNode(true));
     this.titleEl = this.shadowRoot.querySelector('.title');
     this.bodyEl = this.shadowRoot.querySelector('.body');
