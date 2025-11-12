@@ -1,5 +1,6 @@
 import { sharedCss, sharedSheet } from './shared-styles.js';
 import { noteEditModalStyles } from './styles/note-edit-modal-styles.js';
+import { debounce } from '../performance.js';
 
 class NoteEditModal extends HTMLElement {
   constructor() {
@@ -120,7 +121,7 @@ class NoteEditModal extends HTMLElement {
     }
 
     if (bodyInput && charCount) {
-      bodyInput.addEventListener('input', () => {
+      const updateCharCount = debounce(() => {
         const { value } = bodyInput;
         const { length } = value;
         charCount.textContent = `${length} / 1000`;
@@ -131,7 +132,9 @@ class NoteEditModal extends HTMLElement {
         } else if (length > 800) {
           charCount.classList.add('warning');
         }
-      });
+      }, 100);
+      
+      bodyInput.addEventListener('input', updateCharCount);
     }
 
     // Validation
