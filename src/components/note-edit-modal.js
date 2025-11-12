@@ -1,12 +1,14 @@
 import { sharedCss, sharedSheet } from './shared-styles.js';
 import { noteEditModalStyles } from './styles/note-edit-modal-styles.js';
 import { debounce } from '../performance.js';
+import { createFocusTrap, announceToScreenReader } from '../accessibility.js';
 
 class NoteEditModal extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
     this._note = null;
+    this._focusTrap = null;
 
     // Apply shared stylesheet to provide common utilities (buttons, inputs)
     if (sharedSheet && this.shadowRoot.adoptedStyleSheets !== undefined) {
@@ -204,6 +206,17 @@ class NoteEditModal extends HTMLElement {
 
   open() {
     this.setAttribute('open', '');
+    this.setAttribute('role', 'dialog');
+    this.setAttribute('aria-modal', 'true');
+    this.setAttribute('aria-labelledby', 'modal-title');
+    
+    // Create focus trap
+    const modal = this.shadowRoot.querySelector('.modal');
+    if (modal) {
+      this._focusTrap = createFocusTrap(modal);
+      this._focusTrap.enable();
+    }
+    
     // Focus on title input
     setTimeout(() => {
       const titleInput = this.shadowRoot.getElementById('titleInput');
@@ -212,10 +225,25 @@ class NoteEditModal extends HTMLElement {
         titleInput.select();
       }
     }, 100);
+    
+    // Announce to screen readers
+    announceToScreenReader('Edit note dialog opened');
   }
 
   close() {
     this.removeAttribute('open');
+    this.removeAttribute('role');
+    this.removeAttribute('aria-modal');
+    this.removeAttribute('aria-labelledby');
+    
+    // Disable focus trap
+    if (this._focusTrap) {
+      this._focusTrap.disable();
+      this._focusTrap = null;
+    }
+    
+    // Announce to screen readers
+    announceToScreenReader('Dialog closed');
   }
 
   disconnectedCallback() {

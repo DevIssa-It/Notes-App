@@ -18,34 +18,34 @@ template.innerHTML = `
       <div class="created"></div>
       <div class="btns">
         <div class="quick-actions">
-          <button class="favoriteBtn" data-tooltip="Add to favorites">
-            <i class="fas fa-heart"></i>
+          <button class="favoriteBtn" data-tooltip="Add to favorites" aria-label="Add to favorites">
+            <i class="fas fa-heart" aria-hidden="true"></i>
             <span class="btn-emoji">❤️</span>
           </button>
-          <button class="pinBtn" data-tooltip="Pin to top">
-            <i class="fas fa-map-pin"></i>
+          <button class="pinBtn" data-tooltip="Pin to top" aria-label="Pin note to top">
+            <i class="fas fa-map-pin" aria-hidden="true"></i>
             <span class="btn-emoji">📌</span>
           </button>
         </div>
-        <button class="moreBtn">
-          <i class="fas fa-ellipsis-v"></i>
+        <button class="moreBtn" aria-label="More actions" aria-haspopup="true" aria-expanded="false">
+          <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
           <span class="btn-emoji">⋮</span>
         </button>
-        <div class="dropdown-menu">
-          <button class="dropdown-item copy">
-            <span class="item-emoji">📋</span>
+        <div class="dropdown-menu" role="menu">
+          <button class="dropdown-item copy" role="menuitem" aria-label="Copy note content">
+            <span class="item-emoji" aria-hidden="true">📋</span>
             <span>Copy note</span>
           </button>
-          <button class="dropdown-item export">
-            <span class="item-emoji">💾</span>
+          <button class="dropdown-item export" role="menuitem" aria-label="Export note">
+            <span class="item-emoji" aria-hidden="true">💾</span>
             <span>Export</span>
           </button>
-          <button class="dropdown-item archive">
-            <span class="item-emoji">📦</span>
+          <button class="dropdown-item archive" role="menuitem" aria-label="Archive note">
+            <span class="item-emoji" aria-hidden="true">📦</span>
             <span>Archive</span>
           </button>
-          <button class="dropdown-item delete">
-            <span class="item-emoji">🗑️</span>
+          <button class="dropdown-item delete" role="menuitem" aria-label="Delete note">
+            <span class="item-emoji" aria-hidden="true">🗑️</span>
             <span>Delete</span>
           </button>
         </div>
