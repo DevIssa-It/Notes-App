@@ -95,6 +95,68 @@ export const appBarStyles = `
     color:white;
     box-shadow:0 6px 16px rgba(2,132,199,0.4), 0 2px 6px var(--shadow);
   }
+  
+  /* Export Dropdown */
+  .export-dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    background: var(--btn-bg);
+    border: 2px solid var(--btn-border);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    min-width: 200px;
+    z-index: 1000;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+  }
+  
+  .dropdown-menu.show {
+    display: block;
+    animation: dropdownFadeIn 0.2s ease;
+  }
+  
+  @keyframes dropdownFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .dropdown-item {
+    padding: 12px 16px;
+    color: var(--btn-text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.88rem;
+    font-weight: 500;
+  }
+  
+  .dropdown-item:hover {
+    background: rgba(124, 58, 237, 0.2);
+    padding-left: 20px;
+  }
+  
+  .dropdown-item i {
+    width: 16px;
+    text-align: center;
+    opacity: 0.8;
+  }
+  
   @media (max-width:720px){
     .appbar{padding:14px 16px;}
     .logo{width:42px;height:42px;font-size:1.1rem;}

@@ -59,7 +59,7 @@ import {
 } from './handlers/bulk-handlers.js';
 
 import {
-  handleExportNotes as exportNotes,
+  exportNotes,
 } from './handlers/export-import-handlers.js';
 
 // Import utilities
@@ -422,8 +422,11 @@ async function mount() {
     });
   }
 
-  // Export notes
-  document.body.addEventListener('export-notes', exportNotes);
+  // Export notes with format support
+  document.body.addEventListener('export-notes', (e) => {
+    const format = e.detail?.format || 'json';
+    exportNotes(format);
+  });
 
   // Import notes
   document.body.addEventListener('import-notes', async (e) => {

@@ -6,48 +6,167 @@ import { getActiveNotes, getArchivedNotes } from '../state/notes-store.js';
 import { showSuccess, showError } from '../ui-helpers.js';
 
 /**
- * Export all notes to JSON file
+ * Export notes as JSON
+ * @param {Array} activeNotes - Active notes array
+ * @param {Array} archivedNotes - Archived notes array
+ * @returns {string} JSON string
  */
-export function handleExportNotes() {
+function exportAsJSON(activeNotes, archivedNotes) {
+  const exportData = {
+    version: '1.0',
+    exportDate: new Date().toISOString(),
+    notes: {
+      active: activeNotes,
+      archived: archivedNotes,
+    },
+    metadata: {
+      totalNotes: activeNotes.length + archivedNotes.length,
+      activeCount: activeNotes.length,
+      archivedCount: archivedNotes.length,
+    },
+  };
+  
+  return JSON.stringify(exportData, null, 2);
+}
+
+/**
+ * Export notes as plain text
+ * @param {Array} notes - Notes array
+ * @returns {string} Plain text content
+ */
+function exportAsText(notes) {
+  const lines = [
+    '=' .repeat(60),
+    'NOTES BACKUP',
+    `Exported: ${new Date().toLocaleString()}`,
+    `Total Notes: ${notes.length}`,
+    '='.repeat(60),
+    '',
+  ];
+  
+  notes.forEach((note, index) => {
+    lines.push(`[${index + 1}] ${note.title}`);
+    lines.push('-'.repeat(60));
+    lines.push(`Created: ${new Date(note.createdAt).toLocaleString()}`);
+    lines.push(`Status: ${note.archived ? 'Archived' : 'Active'}`);
+    lines.push('');
+    lines.push(note.body);
+    lines.push('');
+    lines.push('='.repeat(60));
+    lines.push('');
+  });
+  
+  return lines.join('\n');
+}
+
+/**
+ * Export notes as Markdown
+ * @param {Array} notes - Notes array
+ * @returns {string} Markdown content
+ */
+function exportAsMarkdown(notes) {
+  const lines = [
+    '# 📝 Notes Backup',
+    '',
+    `**Exported:** ${new Date().toLocaleString()}  `,
+    `**Total Notes:** ${notes.length}`,
+    '',
+    '---',
+    '',
+  ];
+  
+  notes.forEach((note, index) => {
+    const status = note.archived ? '🗄️ Archived' : '✅ Active';
+    const date = new Date(note.createdAt).toLocaleString();
+    
+    lines.push(`## ${index + 1}. ${note.title}`);
+    lines.push('');
+    lines.push(`> **Status:** ${status}  `);
+    lines.push(`> **Created:** ${date}`);
+    lines.push('');
+    lines.push(note.body);
+    lines.push('');
+    lines.push('---');
+    lines.push('');
+  });
+  
+  return lines.join('\n');
+}
+
+/**
+ * Download file to user's computer
+ * @param {string} content - File content
+ * @param {string} mimeType - MIME type
+ * @param {string} extension - File extension
+ */
+function downloadFile(content, mimeType, extension) {
+  const dataBlob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(dataBlob);
+  const link = document.createElement('a');
+  
+  const timestamp = new Date().toISOString().split('T')[0];
+  link.href = url;
+  link.download = `notes-backup-${timestamp}.${extension}`;
+  
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Export notes in specified format
+ * @param {string} format - Export format: 'json', 'txt', or 'markdown'
+ */
+export function exportNotes(format = 'json') {
   try {
     const activeNotes = getActiveNotes();
     const archivedNotes = getArchivedNotes();
+    const allNotes = [...activeNotes, ...archivedNotes];
     
-    const exportData = {
-      version: '1.0',
-      exportDate: new Date().toISOString(),
-      notes: {
-        active: activeNotes,
-        archived: archivedNotes,
-      },
-      metadata: {
-        totalNotes: activeNotes.length + archivedNotes.length,
-        activeCount: activeNotes.length,
-        archivedCount: archivedNotes.length,
-      },
-    };
-
-    const dataStr = JSON.stringify(exportData, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    let content;
+    let mimeType;
+    let extension;
     
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `notes-backup-${new Date().toISOString().split('T')[0]}.json`;
+    switch (format.toLowerCase()) {
+      case 'txt':
+        content = exportAsText(allNotes);
+        mimeType = 'text/plain';
+        extension = 'txt';
+        break;
+        
+      case 'markdown':
+      case 'md':
+        content = exportAsMarkdown(allNotes);
+        mimeType = 'text/markdown';
+        extension = 'md';
+        break;
+        
+      case 'json':
+      default:
+        content = exportAsJSON(activeNotes, archivedNotes);
+        mimeType = 'application/json';
+        extension = 'json';
+        break;
+    }
     
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    downloadFile(content, mimeType, extension);
     
-    URL.revokeObjectURL(url);
-
     showSuccess(
       'Export Successful!',
-      `Exported ${exportData.metadata.totalNotes} notes successfully.`
+      `Exported ${allNotes.length} notes as ${format.toUpperCase()} successfully.`
     );
   } catch (error) {
     showError('Export Failed', error);
   }
+}
+
+/**
+ * Export all notes to JSON file
+ */
+export function handleExportNotes() {
+  exportNotes('json');
 }
 
 /**
