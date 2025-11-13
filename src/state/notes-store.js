@@ -11,19 +11,48 @@ const notesStore = new Map();
 const archivedStore = new Map();
 
 /**
+ * Sort notes by criteria
+ * @param {Array} notes - Notes array
+ * @param {string} sortType - Sort type
+ * @returns {Array} Sorted notes array
+ */
+function sortNotes(notes, sortType) {
+  const sort = sortType || localStorage.getItem('notes-sort') || 'newest';
+  
+  switch (sort) {
+    case 'oldest':
+      return notes.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    
+    case 'title-asc':
+      return notes.sort((a, b) => a.title.localeCompare(b.title));
+    
+    case 'title-desc':
+      return notes.sort((a, b) => b.title.localeCompare(a.title));
+    
+    case 'newest':
+    default:
+      return notes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  }
+}
+
+/**
  * Get all active notes
+ * @param {string} sortType - Sort type (newest, oldest, title-asc, title-desc)
  * @returns {Array} Array of active notes
  */
-export function getActiveNotes() {
-  return Array.from(notesStore.values());
+export function getActiveNotes(sortType = null) {
+  const notes = Array.from(notesStore.values());
+  return sortNotes(notes, sortType);
 }
 
 /**
  * Get all archived notes
+ * @param {string} sortType - Sort type (newest, oldest, title-asc, title-desc)
  * @returns {Array} Array of archived notes
  */
-export function getArchivedNotes() {
-  return Array.from(archivedStore.values());
+export function getArchivedNotes(sortType = null) {
+  const notes = Array.from(archivedStore.values());
+  return sortNotes(notes, sortType);
 }
 
 /**
