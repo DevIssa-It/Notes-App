@@ -9,6 +9,7 @@ class ThemeToggle extends HTMLElement {
   connectedCallback() {
     this.render();
     this._loadTheme();
+    this._setupSystemThemeDetection();
   }
 
   render() {
@@ -43,8 +44,67 @@ class ThemeToggle extends HTMLElement {
   }
 
   _loadTheme() {
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    this._applyTheme(savedTheme);
+    // Check if user has manually set a theme preference
+    const savedTheme = localStorage.getItem('theme');
+    const autoTheme = localStorage.getItem('theme-auto');
+    
+    if (savedTheme && autoTheme !== 'true') {
+      // User has manually selected a theme
+      this._applyTheme(savedTheme);
+    } else {
+      // Auto-detect system preference
+      const systemTheme = this._getSystemTheme();
+      this._applyTheme(systemTheme);
+      
+      // Mark as auto-detected if no manual preference exists
+      if (!savedTheme) {
+        localStorage.setItem('theme-auto', 'true');
+      }
+    }
+  }
+
+  _getSystemTheme() {
+    // Check system preference using matchMedia
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+      return 'light';
+    }
+    return 'dark';
+  }
+
+  _setupSystemThemeDetection() {
+    // Listen for system theme changes
+    if (window.matchMedia) {
+      const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const lightModeQuery = window.matchMedia('(prefers-color-scheme: light)');
+      
+      const handleSystemThemeChange = () => {
+        const autoTheme = localStorage.getItem('theme-auto');
+        
+        // Only auto-switch if user hasn't manually selected a theme
+        if (autoTheme === 'true') {
+          const newTheme = this._getSystemTheme();
+          this._applyTheme(newTheme);
+          localStorage.setItem('theme', newTheme);
+          
+          // Dispatch event
+          this.dispatchEvent(new CustomEvent('theme-changed', {
+            detail: { theme: newTheme, auto: true },
+            bubbles: true,
+            composed: true,
+          }));
+        }
+      };
+      
+      // Add listeners for both dark and light mode changes
+      darkModeQuery.addEventListener('change', handleSystemThemeChange);
+      lightModeQuery.addEventListener('change', handleSystemThemeChange);
+      
+      // Store listeners for cleanup
+      this._systemThemeListeners = {
+        dark: { query: darkModeQuery, handler: handleSystemThemeChange },
+        light: { query: lightModeQuery, handler: handleSystemThemeChange }
+      };
+    }
   }
 
   _toggleTheme() {
@@ -59,10 +119,13 @@ class ThemeToggle extends HTMLElement {
     setTimeout(() => {
       this._applyTheme(newTheme);
       localStorage.setItem('theme', newTheme);
+      
+      // User manually selected theme, disable auto-switching
+      localStorage.setItem('theme-auto', 'false');
 
       // Dispatch event for other components
       this.dispatchEvent(new CustomEvent('theme-changed', {
-        detail: { theme: newTheme },
+        detail: { theme: newTheme, auto: false },
         bubbles: true,
         composed: true,
       }));
@@ -113,6 +176,14 @@ class ThemeToggle extends HTMLElement {
       toggle.classList.remove('light');
       toggle.setAttribute('aria-checked', 'false');
       document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  }
+
+  disconnectedCallback() {
+    // Clean up system theme listeners
+    if (this._systemThemeListeners) {
+      this._systemThemeListeners.dark.query.removeEventListener('change', this._systemThemeListeners.dark.handler);
+      this._systemThemeListeners.light.query.removeEventListener('change', this._systemThemeListeners.light.handler);
     }
   }
 }
