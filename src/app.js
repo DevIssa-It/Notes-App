@@ -2,6 +2,9 @@
 import '../styles.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
+// Import Vercel Analytics
+import vercelAnalytics from './vercel-analytics.js';
+
 // Import components
 import './components/app-bar.js';
 import './components/note-input.js';
@@ -243,6 +246,7 @@ async function mount() {
   // Search functionality
   document.body.addEventListener('search', (e) => {
     setSearchQuery(e.detail.query);
+    vercelAnalytics.trackSearch(e.detail.query);
     refreshViews();
   });
 
@@ -544,3 +548,6 @@ if (document.readyState === 'loading') {
 } else {
   mount();
 }
+
+// Initialize Vercel Analytics
+vercelAnalytics.init();

@@ -12,6 +12,7 @@ import {
   archiveNote as archiveNoteInStore,
   unarchiveNote as unarchiveNoteInStore,
 } from '../state/notes-store.js';
+import vercelAnalytics from '../vercel-analytics.js';
 
 const loadingManager = new LoadingManager();
 
@@ -36,6 +37,10 @@ export async function handleCreateNote(detail, onSuccess) {
     const completeNote = await NotesAPI.getSingleNote(newNote.id);
     addNote(completeNote);
     showSuccess(MESSAGES.SUCCESS.NOTE_CREATED);
+    
+    // Track analytics
+    vercelAnalytics.trackNoteCreated();
+    
     if (onSuccess) onSuccess();
   } catch (error) {
     showError(MESSAGES.ERROR.CREATE_FAILED, error);
@@ -118,6 +123,9 @@ export async function handleDeleteNote(id, onSuccess) {
     await NotesAPI.deleteNote(id);
     deleteNote(id);
     loadingManager.hide();
+    
+    // Track analytics
+    vercelAnalytics.trackNoteDeleted();
 
     // Show success with undo option
     showSuccessWithUndo(MESSAGES.SUCCESS.NOTE_DELETED, async () => {
@@ -170,6 +178,9 @@ export async function handleArchiveNote(id, onSuccess) {
     
     // Move note to archived store locally
     archiveNoteInStore(id);
+    
+    // Track analytics
+    vercelAnalytics.trackNoteArchived();
     
     showSuccess(MESSAGES.SUCCESS.NOTE_ARCHIVED);
     if (onSuccess) onSuccess();

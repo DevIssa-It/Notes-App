@@ -4,6 +4,7 @@
 
 import { getActiveNotes, getArchivedNotes } from '../state/notes-store.js';
 import { showSuccess, showError } from '../ui-helpers.js';
+import vercelAnalytics from '../vercel-analytics.js';
 
 /**
  * Export notes as JSON
@@ -152,6 +153,9 @@ export function exportNotes(format = 'json') {
     }
     
     downloadFile(content, mimeType, extension);
+    
+    // Track analytics
+    vercelAnalytics.trackExport(format);
     
     showSuccess(
       'Export Successful!',

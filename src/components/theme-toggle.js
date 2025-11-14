@@ -1,4 +1,5 @@
 import { themeToggleStyles } from './styles/theme-toggle-styles.js';
+import vercelAnalytics from '../vercel-analytics.js';
 
 class ThemeToggle extends HTMLElement {
   constructor() {
@@ -122,6 +123,9 @@ class ThemeToggle extends HTMLElement {
       
       // User manually selected theme, disable auto-switching
       localStorage.setItem('theme-auto', 'false');
+
+      // Track analytics
+      vercelAnalytics.trackThemeToggle(newTheme);
 
       // Dispatch event for other components
       this.dispatchEvent(new CustomEvent('theme-changed', {
